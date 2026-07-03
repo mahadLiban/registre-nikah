@@ -97,6 +97,27 @@ function AppContent() {
     setScreen("home");
   };
 
+  // Compte imam de démonstration partagé — permet de tester toute
+  // l'application sans créer de compte.
+  const handleDemo = async () => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: "demo@registre-nikah.app",
+      password: "demo-nikah-2026",
+    });
+    if (error || !data.user) return;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("nom, mosquee")
+      .eq("id", data.user.id)
+      .single();
+    setSession({
+      nom: profile?.nom ?? "Imam Démo",
+      mosquee: profile?.mosquee ?? "Mosquée de démonstration",
+      email: data.user.email ?? "",
+    });
+    setScreen("home");
+  };
+
   if (!fontsLoaded || screen === "loading") {
     return <View style={{ flex: 1, backgroundColor: COLORS.bg }} />;
   }
@@ -125,7 +146,7 @@ function AppContent() {
 
   return (
     <>
-      <WelcomeScreen onStart={() => setScreen("signup")} onLogin={() => setScreen("login")} onInvite={handleInvite} />
+      <WelcomeScreen onStart={() => setScreen("signup")} onLogin={() => setScreen("login")} onInvite={handleInvite} onDemo={handleDemo} />
       <StatusBar style="light" />
     </>
   );

@@ -8,9 +8,10 @@ type Props = {
   onStart: () => void;
   onLogin: () => void;
   onInvite: () => void;
+  onDemo: () => void;
 };
 
-export default function WelcomeScreen({ onStart, onLogin, onInvite }: Props) {
+export default function WelcomeScreen({ onStart, onLogin, onInvite, onDemo }: Props) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -39,6 +40,9 @@ export default function WelcomeScreen({ onStart, onLogin, onInvite }: Props) {
         </Pressable>
         <Pressable style={({ pressed }) => [styles.btnSecondaire, pressed && { opacity: 0.88 }]} onPress={onLogin}>
           <Text style={styles.btnSecondaireTexte}>Se connecter</Text>
+        </Pressable>
+        <Pressable style={({ pressed }) => [styles.btnSecondaire, pressed && { opacity: 0.88 }]} onPress={onDemo}>
+          <Text style={styles.btnSecondaireTexte}>🧪 Essayer en mode démo</Text>
         </Pressable>
         <Pressable style={({ pressed }) => [styles.btnInvite, pressed && { opacity: 0.7 }]} onPress={onInvite}>
           <Text style={styles.btnInviteTexte}>Continuer en invité — vérifier une personne</Text>
