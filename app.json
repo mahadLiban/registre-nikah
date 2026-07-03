@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Registre Nikah",
+    "slug": "registre-nikah",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "name": "Registre des Mariages",
+      "shortName": "Registre",
+      "themeColor": "#155E6D",
+      "backgroundColor": "#FAF8F3",
+      "display": "standalone",
+      "lang": "fr"
+    },
+    "experiments": {
+      "baseUrl": "/registre-nikah"
+    },
+    "sdkVersion": "54.0.0",
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}

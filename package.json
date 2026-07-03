@@ -1,0 +1,35 @@
+{
+  "name": "registre-nikah",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@expo-google-fonts/ibm-plex-sans": "^0.4.1",
+    "@expo-google-fonts/manrope": "^0.4.2",
+    "@expo-google-fonts/source-serif-4": "^0.4.1",
+    "@expo/metro-runtime": "~6.1.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@supabase/supabase-js": "^2.108.2",
+    "expo": "^54.0.0",
+    "expo-font": "~14.0.12",
+    "expo-status-bar": "~3.0.9",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-url-polyfill": "^3.0.0",
+    "react-native-web": "^0.21.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.10",
+    "typescript": "~5.9.2"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build:web": "expo export --platform web --output-dir dist && touch dist/.nojekyll",
+    "deploy": "npm run build:web && git checkout --orphan gh-pages-tmp && git --work-tree=dist add --all && git --work-tree=dist commit -m 'Deploy' && git push origin HEAD:gh-pages --force && git checkout -f main && git branch -D gh-pages-tmp"
+  },
+  "private": true
+}
