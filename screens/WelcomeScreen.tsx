@@ -7,9 +7,10 @@ import { supabaseEstConfiguree } from "../lib/supabase";
 type Props = {
   onStart: () => void;
   onLogin: () => void;
+  onInvite: () => void;
 };
 
-export default function WelcomeScreen({ onStart, onLogin }: Props) {
+export default function WelcomeScreen({ onStart, onLogin, onInvite }: Props) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -38,6 +39,9 @@ export default function WelcomeScreen({ onStart, onLogin }: Props) {
         </Pressable>
         <Pressable style={({ pressed }) => [styles.btnSecondaire, pressed && { opacity: 0.88 }]} onPress={onLogin}>
           <Text style={styles.btnSecondaireTexte}>Se connecter</Text>
+        </Pressable>
+        <Pressable style={({ pressed }) => [styles.btnInvite, pressed && { opacity: 0.7 }]} onPress={onInvite}>
+          <Text style={styles.btnInviteTexte}>Continuer en invité — vérifier une personne</Text>
         </Pressable>
       </View>
     </View>
@@ -97,4 +101,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   btnSecondaireTexte: { color: COLORS.sidebarText, fontFamily: FONTS.semibold, fontSize: 15 },
+  btnInvite: { alignItems: "center", paddingVertical: 12 },
+  btnInviteTexte: {
+    color: COLORS.sidebarMuted,
+    fontFamily: FONTS.medium,
+    fontSize: 13.5,
+    textDecorationLine: "underline",
+  },
 });

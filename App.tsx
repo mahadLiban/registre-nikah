@@ -18,7 +18,7 @@ import AuthScreen from "./screens/AuthScreen";
 import HomeScreen from "./screens/HomeScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
 
-export type Session = { nom: string; mosquee: string; email: string };
+export type Session = { nom: string; mosquee: string; email: string; invite?: boolean };
 type Screen = "loading" | "welcome" | "login" | "signup" | "home";
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
@@ -87,9 +87,14 @@ function AppContent() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    if (!session?.invite) await supabase.auth.signOut();
     setSession(null);
     setScreen("welcome");
+  };
+
+  const handleInvite = () => {
+    setSession({ nom: "Invité", mosquee: "", email: "", invite: true });
+    setScreen("home");
   };
 
   if (!fontsLoaded || screen === "loading") {
@@ -120,7 +125,7 @@ function AppContent() {
 
   return (
     <>
-      <WelcomeScreen onStart={() => setScreen("signup")} onLogin={() => setScreen("login")} />
+      <WelcomeScreen onStart={() => setScreen("signup")} onLogin={() => setScreen("login")} onInvite={handleInvite} />
       <StatusBar style="light" />
     </>
   );

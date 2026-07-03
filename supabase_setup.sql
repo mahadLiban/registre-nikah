@@ -59,8 +59,8 @@ create table public.mosquees (
 
 alter table public.mosquees enable row level security;
 
-create policy "Les imams connectés lisent les mosquées" on public.mosquees
-  for select to authenticated using (true);
+create policy "Lecture publique des mosquées (invités inclus)" on public.mosquees
+  for select to anon, authenticated using (true);
 
 create policy "Les imams connectés ajoutent des mosquées" on public.mosquees
   for insert to authenticated with check (true);
@@ -81,8 +81,8 @@ create unique index personnes_identite_unique
 
 alter table public.personnes enable row level security;
 
-create policy "Les imams connectés lisent les personnes" on public.personnes
-  for select to authenticated using (true);
+create policy "Lecture publique des personnes (invités inclus)" on public.personnes
+  for select to anon, authenticated using (true);
 
 create policy "Les imams connectés ajoutent des personnes" on public.personnes
   for insert to authenticated with check (true);
@@ -105,8 +105,8 @@ create table public.mariages (
 
 alter table public.mariages enable row level security;
 
-create policy "Les imams connectés lisent les mariages" on public.mariages
-  for select to authenticated using (true);
+create policy "Lecture publique des mariages (invités inclus)" on public.mariages
+  for select to anon, authenticated using (true);
 
 create policy "Les imams connectés enregistrent des mariages" on public.mariages
   for insert to authenticated with check (true);

@@ -6,7 +6,13 @@ import { Mariage, Stats, mariagesRecents, statsRegistre } from "../lib/registre"
 import { formaterDate } from "../utils/dates";
 import type { Vue } from "./HomeScreen";
 
-export default function DashboardScreen({ onNaviguer }: { onNaviguer: (v: Vue) => void }) {
+export default function DashboardScreen({
+  onNaviguer,
+  invite,
+}: {
+  onNaviguer: (v: Vue) => void;
+  invite?: boolean;
+}) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [recents, setRecents] = useState<Mariage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,12 +61,14 @@ export default function DashboardScreen({ onNaviguer }: { onNaviguer: (v: Vue) =
       )}
 
       <View style={styles.actions}>
-        <Pressable
-          style={({ pressed }) => [styles.btnPrimaire, pressed && { opacity: 0.88 }]}
-          onPress={() => onNaviguer("nouveau-mariage")}
-        >
-          <Text style={styles.btnPrimaireTexte}>+ Nouveau mariage</Text>
-        </Pressable>
+        {!invite && (
+          <Pressable
+            style={({ pressed }) => [styles.btnPrimaire, pressed && { opacity: 0.88 }]}
+            onPress={() => onNaviguer("nouveau-mariage")}
+          >
+            <Text style={styles.btnPrimaireTexte}>+ Nouveau mariage</Text>
+          </Pressable>
+        )}
         <Pressable
           style={({ pressed }) => [styles.btnSecondaire, pressed && { opacity: 0.88 }]}
           onPress={() => onNaviguer("recherche")}

@@ -17,12 +17,12 @@ type Props = {
 
 export type Vue = "dashboard" | "recherche" | "nouveau-mariage" | "nouveau-divorce" | "mosquees";
 
-const NAV: { id: Vue; label: string }[] = [
+const NAV: { id: Vue; label: string; imamSeulement?: boolean }[] = [
   { id: "dashboard", label: "Tableau de bord" },
   { id: "recherche", label: "Vérifier une personne" },
-  { id: "nouveau-mariage", label: "Nouveau mariage" },
-  { id: "nouveau-divorce", label: "Nouveau divorce / veuvage" },
-  { id: "mosquees", label: "Mosquées & imams" },
+  { id: "nouveau-mariage", label: "Nouveau mariage", imamSeulement: true },
+  { id: "nouveau-divorce", label: "Nouveau divorce / veuvage", imamSeulement: true },
+  { id: "mosquees", label: "Mosquées & imams", imamSeulement: true },
 ];
 
 export default function HomeScreen({ session, onLogout }: Props) {
@@ -49,7 +49,7 @@ export default function HomeScreen({ session, onLogout }: Props) {
       </View>
 
       <View style={isMobile ? styles.navRow : styles.navCol}>
-        {NAV.map((item) => (
+        {NAV.filter((item) => !item.imamSeulement || !session.invite).map((item) => (
           <Pressable
             key={item.id}
             style={[styles.navItem, vue === item.id && styles.navItemActive]}
@@ -62,7 +62,7 @@ export default function HomeScreen({ session, onLogout }: Props) {
         ))}
         <Pressable style={styles.navItem} onPress={onLogout}>
           <Text style={[styles.navText, { color: COLORS.sidebarFooter }]}>
-            Déconnexion ({session.nom})
+            {session.invite ? "Quitter le mode invité" : `Déconnexion (${session.nom})`}
           </Text>
         </Pressable>
       </View>
@@ -88,7 +88,7 @@ export default function HomeScreen({ session, onLogout }: Props) {
         ]}
         keyboardShouldPersistTaps="handled"
       >
-        {vue === "dashboard" && <DashboardScreen onNaviguer={setVue} />}
+        {vue === "dashboard" && <DashboardScreen onNaviguer={setVue} invite={!!session.invite} />}
         {vue === "recherche" && <SearchScreen />}
         {vue === "nouveau-mariage" && <NewMarriageScreen />}
         {vue === "nouveau-divorce" && <EndUnionScreen />}
