@@ -14,16 +14,26 @@ export default function WelcomeScreen({ onStart, onLogin, onDemo }: Props) {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top, paddingBottom: insets.bottom + 28 }]}>
+    <View style={[styles.root, { paddingTop: insets.top, paddingBottom: insets.bottom + 26 }]}>
       <View style={styles.contenu}>
         <View style={styles.hero}>
-          <View style={styles.pastille}>
-            <Text style={styles.pastilleTexte}>✍️</Text>
+          {/* Arche de mihrab */}
+          <View style={styles.arche}>
+            <View style={styles.archeInterieure}>
+              <Text style={styles.etoile}>۞</Text>
+              <Text style={styles.titre}>Le Registre</Text>
+            </View>
           </View>
-          <Text style={styles.titre}>Le Registre</Text>
+
+          <View style={styles.filet}>
+            <View style={styles.filetLigne} />
+            <Text style={styles.filetEtoile}>✦</Text>
+            <View style={styles.filetLigne} />
+          </View>
+
           <Text style={styles.sousTitre}>
-            Un endroit unique où chaque union célébrée est inscrite.
-            Réservé aux témoins qui enregistrent les cérémonies.
+            Chaque union célébrée, inscrite en un lieu unique.{"\n"}
+            Réservé aux témoins des cérémonies.
           </Text>
         </View>
 
@@ -36,11 +46,11 @@ export default function WelcomeScreen({ onStart, onLogin, onDemo }: Props) {
         )}
 
         <View style={styles.actions}>
-          <Pressable style={({ pressed }) => [styles.btnPrimaire, pressed && { opacity: 0.9 }]} onPress={onStart}>
-            <Text style={styles.btnPrimaireTexte}>Créer mon compte témoin</Text>
+          <Pressable style={({ pressed }) => [styles.btnOr, pressed && { opacity: 0.9 }]} onPress={onStart}>
+            <Text style={styles.btnOrTexte}>Créer mon compte témoin</Text>
           </Pressable>
-          <Pressable style={({ pressed }) => [styles.btnSecondaire, pressed && { opacity: 0.9 }]} onPress={onLogin}>
-            <Text style={styles.btnSecondaireTexte}>Se connecter</Text>
+          <Pressable style={({ pressed }) => [styles.btnGhost, pressed && { opacity: 0.85 }]} onPress={onLogin}>
+            <Text style={styles.btnGhostTexte}>Se connecter</Text>
           </Pressable>
           <Pressable style={({ pressed }) => [styles.btnDemo, pressed && { opacity: 0.7 }]} onPress={onDemo}>
             <Text style={styles.btnDemoTexte}>Essayer avec le compte de démonstration</Text>
@@ -52,7 +62,7 @@ export default function WelcomeScreen({ onStart, onLogin, onDemo }: Props) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.bg, alignItems: "center" },
+  root: { flex: 1, backgroundColor: COLORS.nuit, alignItems: "center" },
   contenu: {
     flex: 1,
     width: "100%",
@@ -60,22 +70,53 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
     justifyContent: "space-between",
   },
-  hero: { flex: 1, justifyContent: "center", gap: 16 },
-  pastille: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    backgroundColor: COLORS.accentSoft,
+
+  hero: { flex: 1, alignItems: "center", justifyContent: "center", gap: 22 },
+
+  arche: {
+    width: 216,
+    height: 264,
+    borderTopLeftRadius: 108,
+    borderTopRightRadius: 108,
+    borderBottomLeftRadius: 18,
+    borderBottomRightRadius: 18,
+    borderWidth: 1.5,
+    borderColor: COLORS.or,
+    padding: 10,
+    backgroundColor: COLORS.nuitProfonde,
+  },
+  archeInterieure: {
+    flex: 1,
+    borderTopLeftRadius: 98,
+    borderTopRightRadius: 98,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    borderWidth: 1,
+    borderColor: COLORS.orFonce,
     alignItems: "center",
     justifyContent: "center",
+    gap: 6,
+    paddingHorizontal: 14,
   },
-  pastilleTexte: { fontSize: 30 },
-  titre: { fontFamily: FONTS.extrabold, fontSize: 34, color: COLORS.text },
+  etoile: { fontSize: 40, color: COLORS.or, marginBottom: 2 },
+  titre: {
+    fontFamily: FONTS.display,
+    fontSize: 34,
+    color: COLORS.ivoire,
+    textAlign: "center",
+    lineHeight: 44,
+  },
+
+  filet: { flexDirection: "row", alignItems: "center", gap: 12, alignSelf: "stretch" },
+  filetLigne: { flex: 1, height: 1, backgroundColor: COLORS.orFonce, opacity: 0.55 },
+  filetEtoile: { color: COLORS.or, fontSize: 14 },
+
   sousTitre: {
     fontFamily: FONTS.regular,
-    fontSize: 16,
+    fontSize: 15.5,
     lineHeight: 25,
-    color: COLORS.muted,
+    color: COLORS.ivoireDoux,
+    textAlign: "center",
   },
 
   avertissement: {
@@ -87,27 +128,27 @@ const styles = StyleSheet.create({
   avertissementTexte: { color: COLORS.warningText, fontFamily: FONTS.semibold, fontSize: 13 },
 
   actions: { gap: 12 },
-  btnPrimaire: {
-    backgroundColor: COLORS.accent,
+  btnOr: {
+    backgroundColor: COLORS.or,
     borderRadius: 14,
     minHeight: 56,
     alignItems: "center",
     justifyContent: "center",
   },
-  btnPrimaireTexte: { color: COLORS.onAccent, fontFamily: FONTS.bold, fontSize: 16 },
-  btnSecondaire: {
-    backgroundColor: COLORS.surface,
+  btnOrTexte: { color: COLORS.nuitProfonde, fontFamily: FONTS.extrabold, fontSize: 16 },
+  btnGhost: {
+    backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.orFonce,
     borderRadius: 14,
     minHeight: 56,
     alignItems: "center",
     justifyContent: "center",
   },
-  btnSecondaireTexte: { color: COLORS.text, fontFamily: FONTS.bold, fontSize: 16 },
+  btnGhostTexte: { color: COLORS.ivoire, fontFamily: FONTS.bold, fontSize: 16 },
   btnDemo: { alignItems: "center", paddingVertical: 10 },
   btnDemoTexte: {
-    color: COLORS.muted,
+    color: COLORS.ivoireDoux,
     fontFamily: FONTS.semibold,
     fontSize: 13.5,
     textDecorationLine: "underline",

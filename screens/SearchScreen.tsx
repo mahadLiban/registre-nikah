@@ -93,7 +93,7 @@ export default function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  titre: { fontFamily: FONTS.extrabold, fontSize: 24, color: COLORS.text, marginBottom: 4 },
+  titre: { fontFamily: FONTS.display, fontSize: 26, color: COLORS.accentDark, marginBottom: 4, lineHeight: 36 },
   sousTitre: { fontFamily: FONTS.regular, fontSize: 14.5, color: COLORS.muted, marginBottom: 20 },
 
   champ: {

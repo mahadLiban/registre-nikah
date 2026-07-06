@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 10,
   },
-  marque: { fontFamily: FONTS.extrabold, fontSize: 19, color: COLORS.text },
+  marque: { fontFamily: FONTS.display, fontSize: 22, color: COLORS.accentDark, lineHeight: 30 },
   identite: { fontFamily: FONTS.semibold, fontSize: 12.5, color: COLORS.muted, marginTop: 2 },
   deconnexion: { fontFamily: FONTS.semibold, fontSize: 13, color: COLORS.muted, textDecorationLine: "underline" },
 
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: "center",
   },
-  segmentActif: { backgroundColor: COLORS.surface, shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
+  segmentActif: { backgroundColor: COLORS.accentDark },
   segmentTexte: { fontFamily: FONTS.semibold, fontSize: 14, color: COLORS.muted },
-  segmentTexteActif: { color: COLORS.text, fontFamily: FONTS.bold },
+  segmentTexteActif: { color: COLORS.ivoire, fontFamily: FONTS.bold },
 });

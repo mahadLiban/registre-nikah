@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   backBtnText: { fontSize: 22, color: COLORS.text, fontFamily: FONTS.bold, marginTop: -2 },
 
   scroll: { paddingTop: 20, paddingBottom: 40 },
-  title: { fontFamily: FONTS.extrabold, fontSize: 26, color: COLORS.text, marginBottom: 6 },
+  title: { fontFamily: FONTS.display, fontSize: 28, color: COLORS.accentDark, marginBottom: 6, lineHeight: 40 },
   subtitle: { fontFamily: FONTS.regular, fontSize: 15, color: COLORS.muted, marginBottom: 26 },
 
   form: { gap: 16 },

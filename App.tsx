@@ -1,3 +1,4 @@
+import { Amiri_400Regular, Amiri_700Bold } from "@expo-google-fonts/amiri";
 import {
   Manrope_400Regular,
   Manrope_600SemiBold,
@@ -46,6 +47,8 @@ export default function App() {
 
 function AppContent() {
   const [fontsLoaded] = useFonts({
+    Amiri_400Regular,
+    Amiri_700Bold,
     Manrope_400Regular,
     Manrope_600SemiBold,
     Manrope_700Bold,
@@ -140,7 +143,7 @@ function AppContent() {
         onLogin={() => setScreen("login")}
         onDemo={handleDemo}
       />
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </>
   );
 }

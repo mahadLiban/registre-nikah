@@ -134,7 +134,7 @@ export default function UnionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  titre: { fontFamily: FONTS.extrabold, fontSize: 24, color: COLORS.text, marginBottom: 4 },
+  titre: { fontFamily: FONTS.display, fontSize: 26, color: COLORS.accentDark, marginBottom: 4, lineHeight: 36 },
   sousTitre: { fontFamily: FONTS.regular, fontSize: 14.5, color: COLORS.muted, marginBottom: 20 },
   indication: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.muted, paddingVertical: 6 },
   erreur: { color: COLORS.danger, fontFamily: FONTS.semibold, fontSize: 13, marginBottom: 10, textAlign: "center" },

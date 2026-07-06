@@ -1,39 +1,54 @@
-// Refonte épurée : une surface claire, un seul accent, Manrope partout.
+// Palette inspirée de l'art islamique : vert émeraude profond,
+// or des enluminures, ivoire des manuscrits.
 export const COLORS = {
-  bg: "#FAFAF8",
+  // Fond sombre (page de garde)
+  nuit: "#0A4A38",
+  nuitProfonde: "#073527",
+
+  // Surfaces claires (application)
+  bg: "#FAF6EC",
   surface: "#FFFFFF",
-  border: "#E8E8E3",
-  divider: "#F0F0EC",
-  inputBg: "#F4F4F0",
+  border: "#E8DFC9",
+  divider: "#F0EADA",
+  inputBg: "#F4EFE1",
 
-  text: "#1A1A18",
-  muted: "#72726B",
-  soft: "#9C9C94",
+  // Texte
+  text: "#1D1B14",
+  muted: "#77715F",
+  soft: "#A19A85",
+  ivoire: "#F7F1E1",
+  ivoireDoux: "#D8CDAF",
 
-  accent: "#0E7A5F",
-  accentDark: "#0A5C48",
-  onAccent: "#FFFFFF",
-  accentSoft: "#E4F2ED",
+  // Accents
+  accent: "#0E6B4F", // vert émeraude
+  accentDark: "#0A4A38",
+  onAccent: "#F7F1E1",
+  accentSoft: "#E2F0E7",
+  or: "#C9A24B",
+  orFonce: "#A88433",
+  orPale: "#E9DBB6",
 
-  warningBg: "#FDF1DF",
-  warningText: "#8A5A16",
+  warningBg: "#FBF0D8",
+  warningText: "#7E5A14",
 
-  successBg: "#E4F2ED",
-  successText: "#0A5C48",
+  successBg: "#E2F0E7",
+  successText: "#0A4A38",
 
-  danger: "#B3362B",
+  danger: "#A93B2E",
 
-  badgeUnionBg: "#E4F2ED",
-  badgeUnionText: "#0A5C48",
-  badgeDivorceBg: "#FBEAE3",
-  badgeDivorceText: "#8A4126",
-  badgeVeufBg: "#EAECF2",
+  badgeUnionBg: "#E2F0E7",
+  badgeUnionText: "#0A4A38",
+  badgeDivorceBg: "#F7E7DC",
+  badgeDivorceText: "#8A4B26",
+  badgeVeufBg: "#E7E9F0",
   badgeVeufText: "#4E5570",
-  badgeAucuneBg: "#EFEFEA",
-  badgeAucuneText: "#72726B",
+  badgeAucuneBg: "#EFEAD9",
+  badgeAucuneText: "#77715F",
 };
 
 export const FONTS = {
+  // Amiri : police latine dessinée dans l'esprit de la calligraphie naskh
+  display: "Amiri_700Bold",
   regular: "Manrope_400Regular",
   semibold: "Manrope_600SemiBold",
   bold: "Manrope_700Bold",

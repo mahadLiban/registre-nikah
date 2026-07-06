@@ -210,7 +210,7 @@ export default function RegisterUnionScreen({ session, onVoirUnions }: Props) {
 }
 
 const styles = StyleSheet.create({
-  titre: { fontFamily: FONTS.extrabold, fontSize: 24, color: COLORS.text, marginBottom: 4 },
+  titre: { fontFamily: FONTS.display, fontSize: 26, color: COLORS.accentDark, marginBottom: 4, lineHeight: 36 },
   sousTitre: { fontFamily: FONTS.regular, fontSize: 14.5, color: COLORS.muted, marginBottom: 20 },
 
   bloc: {
@@ -257,11 +257,13 @@ const styles = StyleSheet.create({
     height: 72,
     borderRadius: 36,
     backgroundColor: COLORS.accentSoft,
+    borderWidth: 1.5,
+    borderColor: COLORS.or,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 8,
   },
   succesCoche: { fontSize: 34, color: COLORS.accent, fontFamily: FONTS.extrabold },
-  succesTitre: { fontFamily: FONTS.extrabold, fontSize: 22, color: COLORS.text },
+  succesTitre: { fontFamily: FONTS.display, fontSize: 26, color: COLORS.accentDark, lineHeight: 36 },
   succesTexte: { fontFamily: FONTS.regular, fontSize: 15, color: COLORS.muted, textAlign: "center", marginBottom: 18, lineHeight: 22 },
 });
