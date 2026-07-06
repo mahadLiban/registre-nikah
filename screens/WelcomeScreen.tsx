@@ -1,114 +1,114 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { COLORS, FONTS } from "../components/theme";
+import { COLORS, CONTENT_MAX_WIDTH, FONTS } from "../components/theme";
 import { supabaseEstConfiguree } from "../lib/supabase";
 
 type Props = {
   onStart: () => void;
   onLogin: () => void;
-  onInvite: () => void;
   onDemo: () => void;
 };
 
-export default function WelcomeScreen({ onStart, onLogin, onInvite, onDemo }: Props) {
+export default function WelcomeScreen({ onStart, onLogin, onDemo }: Props) {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 32 }]}>
-      <View style={styles.hero}>
-        <Text style={styles.titre}>Registre des Mariages</Text>
-        <Text style={styles.surTitre}>Registre officiel des mariages religieux</Text>
-        <Text style={styles.sousTitre}>
-          Vérifiez en quelques secondes si une personne est déjà mariée religieusement,
-          avant de célébrer une nouvelle union.
-        </Text>
-      </View>
-
-      {!supabaseEstConfiguree && (
-        <View style={styles.avertissement}>
-          <Text style={styles.avertissementTexte}>
-            ⚠ Supabase n'est pas encore configuré. Suivez les instructions du README
-            (créer le projet, exécuter supabase_setup.sql, coller l'URL et la clé dans lib/supabase.ts).
+    <View style={[styles.root, { paddingTop: insets.top, paddingBottom: insets.bottom + 28 }]}>
+      <View style={styles.contenu}>
+        <View style={styles.hero}>
+          <View style={styles.pastille}>
+            <Text style={styles.pastilleTexte}>✍️</Text>
+          </View>
+          <Text style={styles.titre}>Le Registre</Text>
+          <Text style={styles.sousTitre}>
+            Un endroit unique où chaque union célébrée est inscrite.
+            Réservé aux témoins qui enregistrent les cérémonies.
           </Text>
         </View>
-      )}
 
-      <View style={styles.actions}>
-        <Pressable style={({ pressed }) => [styles.btnPrimaire, pressed && { opacity: 0.88 }]} onPress={onStart}>
-          <Text style={styles.btnPrimaireTexte}>Créer un compte imam</Text>
-        </Pressable>
-        <Pressable style={({ pressed }) => [styles.btnSecondaire, pressed && { opacity: 0.88 }]} onPress={onLogin}>
-          <Text style={styles.btnSecondaireTexte}>Se connecter</Text>
-        </Pressable>
-        <Pressable style={({ pressed }) => [styles.btnSecondaire, pressed && { opacity: 0.88 }]} onPress={onDemo}>
-          <Text style={styles.btnSecondaireTexte}>🧪 Essayer en mode démo</Text>
-        </Pressable>
-        <Pressable style={({ pressed }) => [styles.btnInvite, pressed && { opacity: 0.7 }]} onPress={onInvite}>
-          <Text style={styles.btnInviteTexte}>Continuer en invité — vérifier une personne</Text>
-        </Pressable>
+        {!supabaseEstConfiguree && (
+          <View style={styles.avertissement}>
+            <Text style={styles.avertissementTexte}>
+              ⚠ Base de données non configurée — voir le README.
+            </Text>
+          </View>
+        )}
+
+        <View style={styles.actions}>
+          <Pressable style={({ pressed }) => [styles.btnPrimaire, pressed && { opacity: 0.9 }]} onPress={onStart}>
+            <Text style={styles.btnPrimaireTexte}>Créer mon compte témoin</Text>
+          </Pressable>
+          <Pressable style={({ pressed }) => [styles.btnSecondaire, pressed && { opacity: 0.9 }]} onPress={onLogin}>
+            <Text style={styles.btnSecondaireTexte}>Se connecter</Text>
+          </Pressable>
+          <Pressable style={({ pressed }) => [styles.btnDemo, pressed && { opacity: 0.7 }]} onPress={onDemo}>
+            <Text style={styles.btnDemoTexte}>Essayer avec le compte de démonstration</Text>
+          </Pressable>
+        </View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
+  root: { flex: 1, backgroundColor: COLORS.bg, alignItems: "center" },
+  contenu: {
     flex: 1,
-    backgroundColor: COLORS.sidebarBg,
+    width: "100%",
+    maxWidth: CONTENT_MAX_WIDTH,
     paddingHorizontal: 28,
     justifyContent: "space-between",
   },
-  hero: { flex: 1, justifyContent: "center", gap: 12 },
-  titre: { fontFamily: FONTS.serif, fontSize: 34, lineHeight: 42, color: COLORS.sidebarTitle },
-  surTitre: {
-    fontSize: 11,
-    letterSpacing: 1.1,
-    textTransform: "uppercase",
-    color: COLORS.sidebarMuted,
-    fontFamily: FONTS.regular,
+  hero: { flex: 1, justifyContent: "center", gap: 16 },
+  pastille: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: COLORS.accentSoft,
+    alignItems: "center",
+    justifyContent: "center",
   },
+  pastilleTexte: { fontSize: 30 },
+  titre: { fontFamily: FONTS.extrabold, fontSize: 34, color: COLORS.text },
   sousTitre: {
-    fontSize: 15,
-    lineHeight: 23,
-    color: COLORS.sidebarNavIdle,
     fontFamily: FONTS.regular,
-    marginTop: 10,
+    fontSize: 16,
+    lineHeight: 25,
+    color: COLORS.muted,
   },
 
   avertissement: {
     backgroundColor: COLORS.warningBg,
-    borderWidth: 1,
-    borderColor: COLORS.warningBorder,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 14,
-    marginBottom: 18,
+    marginBottom: 16,
   },
-  avertissementTexte: { color: COLORS.warningText, fontFamily: FONTS.medium, fontSize: 13, lineHeight: 19 },
+  avertissementTexte: { color: COLORS.warningText, fontFamily: FONTS.semibold, fontSize: 13 },
 
   actions: { gap: 12 },
   btnPrimaire: {
     backgroundColor: COLORS.accent,
-    borderRadius: 6,
-    minHeight: 54,
+    borderRadius: 14,
+    minHeight: 56,
     alignItems: "center",
     justifyContent: "center",
   },
-  btnPrimaireTexte: { color: COLORS.onAccent, fontFamily: FONTS.semibold, fontSize: 15 },
+  btnPrimaireTexte: { color: COLORS.onAccent, fontFamily: FONTS.bold, fontSize: 16 },
   btnSecondaire: {
-    backgroundColor: "transparent",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: COLORS.sidebarFooter,
-    borderRadius: 6,
-    minHeight: 54,
+    borderColor: COLORS.border,
+    borderRadius: 14,
+    minHeight: 56,
     alignItems: "center",
     justifyContent: "center",
   },
-  btnSecondaireTexte: { color: COLORS.sidebarText, fontFamily: FONTS.semibold, fontSize: 15 },
-  btnInvite: { alignItems: "center", paddingVertical: 12 },
-  btnInviteTexte: {
-    color: COLORS.sidebarMuted,
-    fontFamily: FONTS.medium,
+  btnSecondaireTexte: { color: COLORS.text, fontFamily: FONTS.bold, fontSize: 16 },
+  btnDemo: { alignItems: "center", paddingVertical: 10 },
+  btnDemoTexte: {
+    color: COLORS.muted,
+    fontFamily: FONTS.semibold,
     fontSize: 13.5,
     textDecorationLine: "underline",
   },

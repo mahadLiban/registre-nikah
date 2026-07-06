@@ -1,155 +1,102 @@
-import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import React, { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Session } from "../App";
-import { COLORS, FONTS, MOBILE_BREAKPOINT } from "../components/theme";
-import { Stats, statsRegistre } from "../lib/registre";
-import DashboardScreen from "./DashboardScreen";
-import EndUnionScreen from "./EndUnionScreen";
-import MosquesScreen from "./MosquesScreen";
-import NewMarriageScreen from "./NewMarriageScreen";
+import { COLORS, CONTENT_MAX_WIDTH, FONTS } from "../components/theme";
+import RegisterUnionScreen from "./RegisterUnionScreen";
 import SearchScreen from "./SearchScreen";
+import UnionsScreen from "./UnionsScreen";
 
 type Props = {
   session: Session;
   onLogout: () => void;
 };
 
-export type Vue = "dashboard" | "recherche" | "nouveau-mariage" | "nouveau-divorce" | "mosquees";
+type Onglet = "enregistrer" | "verifier" | "unions";
 
-const NAV: { id: Vue; label: string; imamSeulement?: boolean }[] = [
-  { id: "dashboard", label: "Tableau de bord" },
-  { id: "recherche", label: "Vérifier une personne" },
-  { id: "nouveau-mariage", label: "Nouveau mariage", imamSeulement: true },
-  { id: "nouveau-divorce", label: "Nouveau divorce / veuvage", imamSeulement: true },
-  { id: "mosquees", label: "Mosquées & imams", imamSeulement: true },
+const ONGLETS: { id: Onglet; label: string }[] = [
+  { id: "enregistrer", label: "Enregistrer" },
+  { id: "verifier", label: "Vérifier" },
+  { id: "unions", label: "Unions" },
 ];
 
 export default function HomeScreen({ session, onLogout }: Props) {
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
-  const isMobile = width < MOBILE_BREAKPOINT;
-  const [vue, setVue] = useState<Vue>("dashboard");
-  const [stats, setStats] = useState<Stats | null>(null);
-
-  useEffect(() => {
-    statsRegistre().then(setStats).catch(() => setStats(null));
-  }, [vue]);
-
-  const sidebar = (
-    <View
-      style={[
-        isMobile ? styles.topbar : styles.sidebar,
-        { paddingTop: (isMobile ? 20 : 32) + insets.top },
-      ]}
-    >
-      <View>
-        <Text style={styles.logo}>Registre des Mariages</Text>
-        <Text style={styles.logoSub}>Registre officiel des mariages religieux</Text>
-      </View>
-
-      <View style={isMobile ? styles.navRow : styles.navCol}>
-        {NAV.filter((item) => !item.imamSeulement || !session.invite).map((item) => (
-          <Pressable
-            key={item.id}
-            style={[styles.navItem, vue === item.id && styles.navItemActive]}
-            onPress={() => setVue(item.id)}
-          >
-            <Text style={[styles.navText, vue === item.id && styles.navTextActive]}>
-              {item.label}
-            </Text>
-          </Pressable>
-        ))}
-        <Pressable style={styles.navItem} onPress={onLogout}>
-          <Text style={[styles.navText, { color: COLORS.sidebarFooter }]}>
-            {session.invite ? "Quitter le mode invité" : `Déconnexion (${session.nom})`}
-          </Text>
-        </Pressable>
-      </View>
-
-      {!isMobile && (
-        <Text style={styles.sidebarFooter}>
-          {stats
-            ? `${stats.mariages} mariages enregistrés · ${stats.mosquees} mosquées`
-            : " "}
-        </Text>
-      )}
-    </View>
-  );
+  const [onglet, setOnglet] = useState<Onglet>("enregistrer");
 
   return (
-    <View style={[styles.root, { flexDirection: isMobile ? "column" : "row" }]}>
-      {sidebar}
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={[
-          isMobile ? styles.mainMobile : styles.main,
-          { paddingBottom: 60 + insets.bottom },
-        ]}
-        keyboardShouldPersistTaps="handled"
-      >
-        {vue === "dashboard" && <DashboardScreen onNaviguer={setVue} invite={!!session.invite} />}
-        {vue === "recherche" && <SearchScreen />}
-        {vue === "nouveau-mariage" && <NewMarriageScreen />}
-        {vue === "nouveau-divorce" && <EndUnionScreen />}
-        {vue === "mosquees" && <MosquesScreen />}
-      </ScrollView>
+    <View style={[styles.root, { paddingTop: insets.top + 12 }]}>
+      <View style={styles.contenu}>
+        <View style={styles.entete}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.marque}>Le Registre</Text>
+            <Text style={styles.identite} numberOfLines={1}>
+              {session.nom} · {session.communaute}
+            </Text>
+          </View>
+          <Pressable onPress={onLogout} hitSlop={10}>
+            <Text style={styles.deconnexion}>Se déconnecter</Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.segments}>
+          {ONGLETS.map((o) => (
+            <Pressable
+              key={o.id}
+              style={[styles.segment, onglet === o.id && styles.segmentActif]}
+              onPress={() => setOnglet(o.id)}
+            >
+              <Text style={[styles.segmentTexte, onglet === o.id && styles.segmentTexteActif]}>
+                {o.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 48 + insets.bottom, paddingTop: 20 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {onglet === "enregistrer" && (
+            <RegisterUnionScreen session={session} onVoirUnions={() => setOnglet("unions")} />
+          )}
+          {onglet === "verifier" && <SearchScreen />}
+          {onglet === "unions" && <UnionsScreen />}
+        </ScrollView>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.bg },
+  root: { flex: 1, backgroundColor: COLORS.bg, alignItems: "center" },
+  contenu: { flex: 1, width: "100%", maxWidth: CONTENT_MAX_WIDTH, paddingHorizontal: 20 },
 
-  sidebar: {
-    width: 260,
-    flexShrink: 0,
-    backgroundColor: COLORS.sidebarBg,
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-    gap: 32,
-  },
-  topbar: {
-    width: "100%",
-    backgroundColor: COLORS.sidebarBg,
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    gap: 16,
-  },
-
-  logo: {
-    fontFamily: FONTS.serif,
-    fontSize: 21,
-    lineHeight: 27,
-    color: COLORS.sidebarTitle,
-  },
-  logoSub: {
-    fontSize: 11,
-    letterSpacing: 1.1,
-    textTransform: "uppercase",
-    color: COLORS.sidebarMuted,
-    marginTop: 8,
-    fontFamily: FONTS.regular,
-  },
-
-  navCol: { gap: 4 },
-  navRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  navItem: {
+  entete: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
     paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 6,
   },
-  navItemActive: { backgroundColor: COLORS.accent },
-  navText: { fontSize: 14, color: COLORS.sidebarNavIdle, fontFamily: FONTS.regular },
-  navTextActive: { color: COLORS.onAccent, fontFamily: FONTS.semibold },
+  marque: { fontFamily: FONTS.extrabold, fontSize: 19, color: COLORS.text },
+  identite: { fontFamily: FONTS.semibold, fontSize: 12.5, color: COLORS.muted, marginTop: 2 },
+  deconnexion: { fontFamily: FONTS.semibold, fontSize: 13, color: COLORS.muted, textDecorationLine: "underline" },
 
-  sidebarFooter: {
-    marginTop: "auto",
-    fontSize: 12,
-    color: COLORS.sidebarFooter,
-    fontFamily: FONTS.regular,
+  segments: {
+    flexDirection: "row",
+    backgroundColor: COLORS.inputBg,
+    borderRadius: 14,
+    padding: 4,
+    marginTop: 10,
   },
-
-  main: { padding: 48, paddingHorizontal: 56 },
-  mainMobile: { padding: 20, paddingTop: 28 },
+  segment: {
+    flex: 1,
+    paddingVertical: 11,
+    borderRadius: 11,
+    alignItems: "center",
+  },
+  segmentActif: { backgroundColor: COLORS.surface, shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
+  segmentTexte: { fontFamily: FONTS.semibold, fontSize: 14, color: COLORS.muted },
+  segmentTexteActif: { color: COLORS.text, fontFamily: FONTS.bold },
 });

@@ -8,60 +8,50 @@ export type Personne = {
   sexe: "H" | "F";
 };
 
-export type Mosquee = {
-  id: string;
-  nom: string;
-  ville: string;
-  imam: string;
-};
-
-export type Mariage = {
+export type Union = {
   id: string;
   epoux_id: string;
   epouse_id: string;
   date_mariage: string;
   lieu: string | null;
-  mosquee_id: string | null;
-  imam: string | null;
+  imam: string | null; // nom du témoin qui a enregistré la cérémonie
   statut: "actif" | "divorce" | "veuvage";
   date_fin: string | null;
   epoux: Personne;
   epouse: Personne;
-  mosquee: Mosquee | null;
 };
 
-const SELECTION_MARIAGE = `*,
+const SELECTION_UNION = `*,
   epoux:personnes!mariages_epoux_id_fkey(*),
-  epouse:personnes!mariages_epouse_id_fkey(*),
-  mosquee:mosquees(*)`;
+  epouse:personnes!mariages_epouse_id_fkey(*)`;
 
-// ---- Statut matrimonial (logique du prototype : union active > dernière union terminée > célibataire)
+// ---- Statut d'une personne : union en cours > dernière union terminée > aucune
 
 export type KindStatut = "actif" | "divorce" | "veuf" | "none";
 
 export type Statut = {
   kind: KindStatut;
   label: string;
-  mariage: Mariage | null;
+  union: Union | null;
 };
 
-export function statutDepuisMariages(mariages: Mariage[]): Statut {
-  if (mariages.length === 0) return { kind: "none", label: "Célibataire", mariage: null };
-  const actif = mariages.find((m) => m.statut === "actif");
-  if (actif) return { kind: "actif", label: "Marié(e)", mariage: actif };
-  const tries = [...mariages].sort((a, b) =>
+export function statutDepuisUnions(unions: Union[]): Statut {
+  if (unions.length === 0) return { kind: "none", label: "Aucune union", union: null };
+  const active = unions.find((u) => u.statut === "actif");
+  if (active) return { kind: "actif", label: "En union", union: active };
+  const triees = [...unions].sort((a, b) =>
     (a.date_fin || a.date_mariage).localeCompare(b.date_fin || b.date_mariage)
   );
-  const dernier = tries[tries.length - 1];
-  if (dernier.statut === "veuvage") return { kind: "veuf", label: "Veuf(ve)", mariage: dernier };
-  return { kind: "divorce", label: "Divorcé(e)", mariage: dernier };
+  const derniere = triees[triees.length - 1];
+  if (derniere.statut === "veuvage") return { kind: "veuf", label: "Veuf(ve)", union: derniere };
+  return { kind: "divorce", label: "Divorcé(e)", union: derniere };
 }
 
-export function conjointDe(m: Mariage, personneId: string): Personne {
-  return m.epoux_id === personneId ? m.epouse : m.epoux;
+export function conjointDe(u: Union, personneId: string): Personne {
+  return u.epoux_id === personneId ? u.epouse : u.epoux;
 }
 
-// ---- Recherche
+// ---- Vérification
 
 export type ResultatRecherche = { personne: Personne; statut: Statut };
 
@@ -77,24 +67,24 @@ export async function rechercherStatuts(q: string): Promise<ResultatRecherche[]>
   if (!personnes || personnes.length === 0) return [];
 
   const ids = personnes.map((p) => p.id).join(",");
-  const { data: mariages, error: erreurMariages } = await supabase
+  const { data: unions, error: erreurUnions } = await supabase
     .from("mariages")
-    .select(SELECTION_MARIAGE)
+    .select(SELECTION_UNION)
     .or(`epoux_id.in.(${ids}),epouse_id.in.(${ids})`);
-  if (erreurMariages) throw new Error(erreurMariages.message);
-  const tous = (mariages ?? []) as unknown as Mariage[];
+  if (erreurUnions) throw new Error(erreurUnions.message);
+  const toutes = (unions ?? []) as unknown as Union[];
 
   return personnes.map((p) => ({
     personne: p,
-    statut: statutDepuisMariages(
-      tous.filter((m) => m.epoux_id === p.id || m.epouse_id === p.id)
+    statut: statutDepuisUnions(
+      toutes.filter((u) => u.epoux_id === p.id || u.epouse_id === p.id)
     ),
   }));
 }
 
-// ---- Conflit en temps réel (par prénom + nom, comme le prototype)
+// ---- Alerte en temps réel (par prénom + nom)
 
-export async function conflitActif(prenom: string, nom: string): Promise<Mariage | null> {
+export async function unionActiveDe(prenom: string, nom: string): Promise<Union | null> {
   if (!prenom.trim() || !nom.trim()) return null;
   const { data: personnes, error } = await supabase
     .from("personnes")
@@ -104,81 +94,27 @@ export async function conflitActif(prenom: string, nom: string): Promise<Mariage
   if (error || !personnes || personnes.length === 0) return null;
 
   const ids = personnes.map((p) => p.id).join(",");
-  const { data: mariages } = await supabase
+  const { data: unions } = await supabase
     .from("mariages")
-    .select(SELECTION_MARIAGE)
+    .select(SELECTION_UNION)
     .eq("statut", "actif")
     .or(`epoux_id.in.(${ids}),epouse_id.in.(${ids})`)
     .limit(1);
-  return ((mariages ?? [])[0] as unknown as Mariage) ?? null;
+  return ((unions ?? [])[0] as unknown as Union) ?? null;
 }
 
-// ---- Statistiques (tableau de bord + pied de barre latérale)
+// ---- Registre
 
-export type Stats = { mariages: number; actifs: number; divorces: number; mosquees: number };
-
-export async function statsRegistre(): Promise<Stats> {
-  const compter = async (table: string, filtre?: { col: string; val: string }) => {
-    let req = supabase.from(table).select("*", { count: "exact", head: true });
-    if (filtre) req = req.eq(filtre.col, filtre.val);
-    const { count, error } = await req;
-    if (error) throw new Error(error.message);
-    return count ?? 0;
-  };
-  const [mariages, actifs, divorces, mosquees] = await Promise.all([
-    compter("mariages"),
-    compter("mariages", { col: "statut", val: "actif" }),
-    compter("mariages", { col: "statut", val: "divorce" }),
-    compter("mosquees"),
-  ]);
-  return { mariages, actifs, divorces, mosquees };
-}
-
-export async function mariagesRecents(limite = 5): Promise<Mariage[]> {
+export async function listerUnions(): Promise<Union[]> {
   const { data, error } = await supabase
     .from("mariages")
-    .select(SELECTION_MARIAGE)
-    .order("date_mariage", { ascending: false })
-    .limit(limite);
-  if (error) throw new Error(error.message);
-  return (data ?? []) as unknown as Mariage[];
-}
-
-export async function unionsActives(): Promise<Mariage[]> {
-  const { data, error } = await supabase
-    .from("mariages")
-    .select(SELECTION_MARIAGE)
-    .eq("statut", "actif")
+    .select(SELECTION_UNION)
     .order("date_mariage", { ascending: false });
   if (error) throw new Error(error.message);
-  return (data ?? []) as unknown as Mariage[];
+  return (data ?? []) as unknown as Union[];
 }
 
-// ---- Mosquées
-
-export async function listerMosquees(): Promise<(Mosquee & { nb_mariages: number })[]> {
-  const [{ data: mosquees, error }, { data: mariages, error: e2 }] = await Promise.all([
-    supabase.from("mosquees").select("*").order("nom"),
-    supabase.from("mosquees").select("id, mariages(count)"),
-  ]);
-  if (error) throw new Error(error.message);
-  if (e2) throw new Error(e2.message);
-  const compte = new Map(
-    (mariages ?? []).map((m: any) => [m.id, m.mariages?.[0]?.count ?? 0])
-  );
-  return (mosquees ?? []).map((mq) => ({ ...mq, nb_mariages: compte.get(mq.id) ?? 0 }));
-}
-
-export async function ajouterMosquee(mq: { nom: string; ville: string; imam: string }): Promise<void> {
-  const { error } = await supabase.from("mosquees").insert({
-    nom: mq.nom.trim(),
-    ville: mq.ville.trim(),
-    imam: mq.imam.trim(),
-  });
-  if (error) throw new Error(error.message);
-}
-
-// ---- Enregistrement d'un mariage
+// ---- Enregistrement
 
 type NouvellePersonne = { prenom: string; nom: string; date_naissance: string };
 
@@ -204,19 +140,19 @@ async function trouverOuCreerPersonne(p: NouvellePersonne, sexe: "H" | "F"): Pro
   return creee;
 }
 
-export type DemandeMariage = {
+export type DemandeUnion = {
   epoux: NouvellePersonne;
   epouse: NouvellePersonne;
   date_mariage: string;
   lieu: string;
-  mosquee: Mosquee;
+  temoin: string;
 };
 
-export async function enregistrerMariage(demande: DemandeMariage): Promise<void> {
+export async function enregistrerUnion(demande: DemandeUnion): Promise<void> {
   const epoux = await trouverOuCreerPersonne(demande.epoux, "H");
   const epouse = await trouverOuCreerPersonne(demande.epouse, "F");
   if (epoux.id === epouse.id) {
-    throw new Error("L'époux et l'épouse ne peuvent pas être la même personne.");
+    throw new Error("Les deux personnes ne peuvent pas être identiques.");
   }
 
   const { data: session } = await supabase.auth.getSession();
@@ -224,25 +160,24 @@ export async function enregistrerMariage(demande: DemandeMariage): Promise<void>
     epoux_id: epoux.id,
     epouse_id: epouse.id,
     date_mariage: demande.date_mariage,
-    lieu: demande.lieu.trim() || demande.mosquee.ville,
-    mosquee_id: demande.mosquee.id,
-    imam: demande.mosquee.imam,
+    lieu: demande.lieu.trim() || null,
+    imam: demande.temoin,
     enregistre_par: session.session?.user.id ?? null,
   });
   if (error) throw new Error(error.message);
 }
 
-// ---- Fin d'union
+// ---- Clôture
 
-export async function finUnion(
-  mariageId: string,
+export async function cloturerUnion(
+  unionId: string,
   type: "divorce" | "veuvage",
   dateFin: string
 ): Promise<void> {
   const { error } = await supabase
     .from("mariages")
     .update({ statut: type, date_fin: dateFin })
-    .eq("id", mariageId)
+    .eq("id", unionId)
     .eq("statut", "actif");
   if (error) throw new Error(error.message);
 }

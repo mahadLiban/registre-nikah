@@ -11,12 +11,12 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { COLORS, FONTS } from "../components/theme";
+import { COLORS, CONTENT_MAX_WIDTH, FONTS } from "../components/theme";
 import { supabase } from "../lib/supabase";
 
 type Props = {
   initialMode?: "login" | "signup";
-  onAuthenticated: (nom: string, mosquee: string, email: string) => void;
+  onAuthenticated: (nom: string, communaute: string, email: string) => void;
   onBack: () => void;
 };
 
@@ -24,7 +24,7 @@ export default function AuthScreen({ initialMode = "login", onAuthenticated, onB
   const insets = useSafeAreaInsets();
   const [mode, setMode] = useState<"login" | "signup">(initialMode);
   const [nom, setNom] = useState("");
-  const [mosquee, setMosquee] = useState("");
+  const [communaute, setCommunaute] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,14 +51,14 @@ export default function AuthScreen({ initialMode = "login", onAuthenticated, onB
   const handleSignup = async () => {
     setError(null);
     if (!nom.trim()) { setError("Entrez votre nom."); return; }
-    if (!mosquee.trim()) { setError("Entrez le nom de votre mosquée."); return; }
+    if (!communaute.trim()) { setError("Indiquez votre communauté ou votre lieu de culte."); return; }
     if (!email.trim() || !email.includes("@")) { setError("Entrez un email valide."); return; }
     if (password.length < 6) { setError("Le mot de passe doit faire au moins 6 caractères."); return; }
     setLoading(true);
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: { data: { nom: nom.trim(), mosquee: mosquee.trim() } },
+      options: { data: { nom: nom.trim(), mosquee: communaute.trim() } },
     });
     setLoading(false);
     if (signUpError || !data.user) {
@@ -66,153 +66,153 @@ export default function AuthScreen({ initialMode = "login", onAuthenticated, onB
       setError(msg === "User already registered" ? "Un compte existe déjà avec cet email." : msg || "Inscription impossible.");
       return;
     }
-    onAuthenticated(nom.trim(), mosquee.trim(), email.trim());
+    onAuthenticated(nom.trim(), communaute.trim(), email.trim());
   };
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + 16 }]}>
-      <Pressable style={styles.backBtn} onPress={onBack} hitSlop={10}>
-        <Text style={styles.backBtnText}>‹</Text>
-      </Pressable>
+      <View style={styles.contenu}>
+        <Pressable style={styles.backBtn} onPress={onBack} hitSlop={10}>
+          <Text style={styles.backBtnText}>‹</Text>
+        </Pressable>
 
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>{isSignup ? "Créer un compte imam" : "Connectez-vous"}</Text>
-          <Text style={styles.subtitle}>
-            {isSignup
-              ? "L'accès au registre est réservé aux imams."
-              : "Accédez au registre des mariages religieux."}
-          </Text>
-
-          <View style={styles.form}>
-            {isSignup && (
-              <>
-                <View>
-                  <Text style={styles.label}>Nom complet</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Imam Youssef Benali"
-                    placeholderTextColor={COLORS.textSoft}
-                    value={nom}
-                    onChangeText={setNom}
-                    autoCorrect={false}
-                  />
-                </View>
-                <View>
-                  <Text style={styles.label}>Mosquée</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Mosquée Al-Fath, Anvers"
-                    placeholderTextColor={COLORS.textSoft}
-                    value={mosquee}
-                    onChangeText={setMosquee}
-                    autoCorrect={false}
-                  />
-                </View>
-              </>
-            )}
-
-            <View>
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="imam@email.com"
-                placeholderTextColor={COLORS.textSoft}
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="email-address"
-              />
-            </View>
-
-            <View>
-              <Text style={styles.label}>Mot de passe</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="••••••••"
-                placeholderTextColor={COLORS.textSoft}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoCapitalize="none"
-              />
-            </View>
-
-            {error && <Text style={styles.error}>{error}</Text>}
-
-            <Pressable
-              style={({ pressed }) => [styles.submitBtn, pressed && { opacity: 0.88 }]}
-              onPress={isSignup ? handleSignup : handleLogin}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color={COLORS.onAccent} />
-              ) : (
-                <Text style={styles.submitText}>{isSignup ? "Créer le compte" : "Se connecter"}</Text>
-              )}
-            </Pressable>
-          </View>
-
-          <Pressable onPress={() => { setError(null); setMode(isSignup ? "login" : "signup"); }}>
-            <Text style={styles.switchText}>
-              {isSignup ? "Déjà inscrit ? Se connecter" : "Pas encore de compte ? S'inscrire"}
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+            <Text style={styles.title}>{isSignup ? "Créer mon compte témoin" : "Connexion"}</Text>
+            <Text style={styles.subtitle}>
+              {isSignup
+                ? "Le registre est réservé aux témoins qui enregistrent les cérémonies."
+                : "Content de vous revoir."}
             </Text>
-          </Pressable>
-        </ScrollView>
-      </KeyboardAvoidingView>
+
+            <View style={styles.form}>
+              {isSignup && (
+                <>
+                  <View>
+                    <Text style={styles.label}>Votre nom complet</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Youssef Benali"
+                      placeholderTextColor={COLORS.soft}
+                      value={nom}
+                      onChangeText={setNom}
+                      autoCorrect={false}
+                    />
+                  </View>
+                  <View>
+                    <Text style={styles.label}>Communauté ou lieu de culte</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Al-Fath, Anvers"
+                      placeholderTextColor={COLORS.soft}
+                      value={communaute}
+                      onChangeText={setCommunaute}
+                      autoCorrect={false}
+                    />
+                  </View>
+                </>
+              )}
+
+              <View>
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="vous@email.com"
+                  placeholderTextColor={COLORS.soft}
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="email-address"
+                />
+              </View>
+
+              <View>
+                <Text style={styles.label}>Mot de passe</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor={COLORS.soft}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  autoCapitalize="none"
+                />
+              </View>
+
+              {error && <Text style={styles.error}>{error}</Text>}
+
+              <Pressable
+                style={({ pressed }) => [styles.submitBtn, pressed && { opacity: 0.9 }]}
+                onPress={isSignup ? handleSignup : handleLogin}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color={COLORS.onAccent} />
+                ) : (
+                  <Text style={styles.submitText}>{isSignup ? "Créer le compte" : "Se connecter"}</Text>
+                )}
+              </Pressable>
+            </View>
+
+            <Pressable onPress={() => { setError(null); setMode(isSignup ? "login" : "signup"); }}>
+              <Text style={styles.switchText}>
+                {isSignup ? "Déjà inscrit ? Se connecter" : "Pas encore de compte ? S'inscrire"}
+              </Text>
+            </Pressable>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.bg, paddingHorizontal: 24 },
+  root: { flex: 1, backgroundColor: COLORS.bg, alignItems: "center" },
+  contenu: { flex: 1, width: "100%", maxWidth: CONTENT_MAX_WIDTH, paddingHorizontal: 24 },
   backBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 6,
-    backgroundColor: COLORS.card,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 8,
   },
-  backBtnText: { fontSize: 22, color: COLORS.text, fontFamily: FONTS.semibold, marginTop: -2 },
+  backBtnText: { fontSize: 22, color: COLORS.text, fontFamily: FONTS.bold, marginTop: -2 },
 
-  scroll: { paddingTop: 16, paddingBottom: 40, maxWidth: 480, width: "100%", alignSelf: "center" },
-  title: { fontFamily: FONTS.serif, fontSize: 28, color: COLORS.text, marginBottom: 6 },
-  subtitle: { fontSize: 14, color: COLORS.textMuted, fontFamily: FONTS.regular, marginBottom: 24 },
+  scroll: { paddingTop: 20, paddingBottom: 40 },
+  title: { fontFamily: FONTS.extrabold, fontSize: 26, color: COLORS.text, marginBottom: 6 },
+  subtitle: { fontFamily: FONTS.regular, fontSize: 15, color: COLORS.muted, marginBottom: 26 },
 
   form: { gap: 16 },
-  label: { fontSize: 12, color: COLORS.textMuted, fontFamily: FONTS.regular, marginBottom: 6 },
+  label: { fontFamily: FONTS.bold, fontSize: 13, color: COLORS.text, marginBottom: 7 },
   input: {
     backgroundColor: COLORS.inputBg,
-    borderWidth: 1,
-    borderColor: COLORS.inputBorder,
-    borderRadius: 6,
-    paddingHorizontal: 14,
-    minHeight: 48,
-    fontSize: 15,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    minHeight: 52,
+    fontSize: 15.5,
     fontFamily: FONTS.regular,
     color: COLORS.text,
   },
-  error: { color: COLORS.red, fontFamily: FONTS.medium, fontSize: 13, textAlign: "center" },
+  error: { color: COLORS.danger, fontFamily: FONTS.semibold, fontSize: 13, textAlign: "center" },
   submitBtn: {
     backgroundColor: COLORS.accent,
-    borderRadius: 6,
-    minHeight: 52,
+    borderRadius: 14,
+    minHeight: 56,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 4,
   },
-  submitText: { color: COLORS.onAccent, fontFamily: FONTS.semibold, fontSize: 15 },
-
+  submitText: { color: COLORS.onAccent, fontFamily: FONTS.bold, fontSize: 16 },
   switchText: {
-    color: COLORS.textMuted,
-    fontFamily: FONTS.medium,
+    color: COLORS.muted,
+    fontFamily: FONTS.semibold,
     fontSize: 13.5,
     textAlign: "center",
-    marginTop: 22,
+    marginTop: 24,
   },
 });

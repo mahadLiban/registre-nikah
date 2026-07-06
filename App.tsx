@@ -1,12 +1,9 @@
 import {
-  IBMPlexSans_400Regular,
-  IBMPlexSans_500Medium,
-  IBMPlexSans_600SemiBold,
-} from "@expo-google-fonts/ibm-plex-sans";
-import {
-  SourceSerif4_600SemiBold,
-  SourceSerif4_700Bold,
-} from "@expo-google-fonts/source-serif-4";
+  Manrope_400Regular,
+  Manrope_600SemiBold,
+  Manrope_700Bold,
+  Manrope_800ExtraBold,
+} from "@expo-google-fonts/manrope";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
@@ -18,7 +15,7 @@ import AuthScreen from "./screens/AuthScreen";
 import HomeScreen from "./screens/HomeScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
 
-export type Session = { nom: string; mosquee: string; email: string; invite?: boolean };
+export type Session = { nom: string; communaute: string; email: string };
 type Screen = "loading" | "welcome" | "login" | "signup" | "home";
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
@@ -27,10 +24,9 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { err
   render() {
     if (this.state.error) {
       return (
-        <View style={{ flex: 1, backgroundColor: "#FAF8F3", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <View style={{ flex: 1, backgroundColor: "#FAFAF8", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <Text style={{ fontSize: 16, color: "#B3362B", fontWeight: "bold", marginBottom: 12 }}>Erreur application</Text>
           <Text style={{ fontSize: 12, color: "#333", textAlign: "center" }}>{this.state.error.message}</Text>
-          <Text style={{ fontSize: 10, color: "#888", marginTop: 12, textAlign: "center" }}>{this.state.error.stack?.slice(0, 300)}</Text>
         </View>
       );
     }
@@ -50,11 +46,10 @@ export default function App() {
 
 function AppContent() {
   const [fontsLoaded] = useFonts({
-    SourceSerif4_600SemiBold,
-    SourceSerif4_700Bold,
-    IBMPlexSans_400Regular,
-    IBMPlexSans_500Medium,
-    IBMPlexSans_600SemiBold,
+    Manrope_400Regular,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+    Manrope_800ExtraBold,
   });
   const [screen, setScreen] = useState<Screen>("loading");
   const [session, setSession] = useState<Session | null>(null);
@@ -76,29 +71,23 @@ function AppContent() {
         setScreen("welcome");
         return;
       }
-      setSession({ nom: profile.nom, mosquee: profile.mosquee, email: user.email ?? "" });
+      setSession({ nom: profile.nom, communaute: profile.mosquee, email: user.email ?? "" });
       setScreen("home");
     })();
   }, []);
 
-  const handleAuthenticated = (nom: string, mosquee: string, email: string) => {
-    setSession({ nom, mosquee, email });
+  const handleAuthenticated = (nom: string, communaute: string, email: string) => {
+    setSession({ nom, communaute, email });
     setScreen("home");
   };
 
   const handleLogout = async () => {
-    if (!session?.invite) await supabase.auth.signOut();
+    await supabase.auth.signOut();
     setSession(null);
     setScreen("welcome");
   };
 
-  const handleInvite = () => {
-    setSession({ nom: "Invité", mosquee: "", email: "", invite: true });
-    setScreen("home");
-  };
-
-  // Compte imam de démonstration partagé — permet de tester toute
-  // l'application sans créer de compte.
+  // Compte de démonstration partagé — pour essayer sans créer de compte.
   const handleDemo = async () => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: "demo@registre-nikah.app",
@@ -111,8 +100,8 @@ function AppContent() {
       .eq("id", data.user.id)
       .single();
     setSession({
-      nom: profile?.nom ?? "Imam Démo",
-      mosquee: profile?.mosquee ?? "Mosquée de démonstration",
+      nom: profile?.nom ?? "Témoin démo",
+      communaute: profile?.mosquee ?? "Démonstration",
       email: data.user.email ?? "",
     });
     setScreen("home");
@@ -130,7 +119,7 @@ function AppContent() {
           onAuthenticated={handleAuthenticated}
           onBack={() => setScreen("welcome")}
         />
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
       </>
     );
   }
@@ -139,15 +128,19 @@ function AppContent() {
     return (
       <>
         <HomeScreen session={session} onLogout={handleLogout} />
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
       </>
     );
   }
 
   return (
     <>
-      <WelcomeScreen onStart={() => setScreen("signup")} onLogin={() => setScreen("login")} onInvite={handleInvite} onDemo={handleDemo} />
-      <StatusBar style="light" />
+      <WelcomeScreen
+        onStart={() => setScreen("signup")}
+        onLogin={() => setScreen("login")}
+        onDemo={handleDemo}
+      />
+      <StatusBar style="dark" />
     </>
   );
 }

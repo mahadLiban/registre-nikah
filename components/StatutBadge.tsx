@@ -4,10 +4,10 @@ import type { KindStatut } from "../lib/registre";
 import { COLORS, FONTS } from "./theme";
 
 const STYLES_PAR_KIND: Record<KindStatut, { bg: string; texte: string }> = {
-  actif: { bg: COLORS.badgeMarieBg, texte: COLORS.badgeMarieText },
+  actif: { bg: COLORS.badgeUnionBg, texte: COLORS.badgeUnionText },
   divorce: { bg: COLORS.badgeDivorceBg, texte: COLORS.badgeDivorceText },
   veuf: { bg: COLORS.badgeVeufBg, texte: COLORS.badgeVeufText },
-  none: { bg: COLORS.badgeCelibBg, texte: COLORS.badgeCelibText },
+  none: { bg: COLORS.badgeAucuneBg, texte: COLORS.badgeAucuneText },
 };
 
 export default function StatutBadge({ kind, label }: { kind: KindStatut; label: string }) {
@@ -26,5 +26,5 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     alignSelf: "flex-start",
   },
-  texte: { fontSize: 12, fontFamily: FONTS.semibold },
+  texte: { fontSize: 12, fontFamily: FONTS.bold },
 });

@@ -7,20 +7,19 @@ import { formaterDate } from "../utils/dates";
 
 function detailPour(r: ResultatRecherche): string {
   const { statut, personne } = r;
-  if (statut.kind === "actif" && statut.mariage) {
-    const m = statut.mariage;
-    const conjoint = conjointDe(m, personne.id);
-    const lieu = m.lieu ? `, à ${m.lieu}` : "";
-    const mosquee = m.mosquee ? ` (${m.mosquee.nom}${m.imam ? `, Imam ${m.imam}` : ""})` : "";
-    return `Marié(e) à ${conjoint.prenom} ${conjoint.nom} depuis le ${formaterDate(m.date_mariage)}${lieu}${mosquee}.`;
+  if (statut.kind === "actif" && statut.union) {
+    const u = statut.union;
+    const conjoint = conjointDe(u, personne.id);
+    const lieu = u.lieu ? `, à ${u.lieu}` : "";
+    return `En union avec ${conjoint.prenom} ${conjoint.nom} depuis le ${formaterDate(u.date_mariage)}${lieu}.`;
   }
-  if ((statut.kind === "divorce" || statut.kind === "veuf") && statut.mariage) {
-    const m = statut.mariage;
-    const conjoint = conjointDe(m, personne.id);
-    const verbe = statut.kind === "veuf" ? "Veuf/veuve de" : "Divorcé(e) de";
-    return `${verbe} ${conjoint.prenom} ${conjoint.nom} (marié(e) le ${formaterDate(m.date_mariage)}, union terminée le ${formaterDate(m.date_fin)}).`;
+  if ((statut.kind === "divorce" || statut.kind === "veuf") && statut.union) {
+    const u = statut.union;
+    const conjoint = conjointDe(u, personne.id);
+    const motif = statut.kind === "veuf" ? "veuvage" : "divorce";
+    return `Union avec ${conjoint.prenom} ${conjoint.nom} terminée le ${formaterDate(u.date_fin)} (${motif}).`;
   }
-  return "Aucun mariage enregistré dans ce registre.";
+  return "Aucune union inscrite au registre.";
 }
 
 export default function SearchScreen() {
@@ -51,28 +50,28 @@ export default function SearchScreen() {
 
   return (
     <View>
-      <Text style={styles.h1}>Vérifier une personne</Text>
+      <Text style={styles.titre}>Vérifier une personne</Text>
       <Text style={styles.sousTitre}>
-        Recherchez un nom pour connaître son statut matrimonial religieux actuel.
+        Avant une cérémonie, vérifiez si la personne a déjà une union en cours.
       </Text>
 
       <TextInput
-        style={styles.champRecherche}
-        placeholder="Prénom et/ou nom…"
-        placeholderTextColor={COLORS.textSoft}
+        style={styles.champ}
+        placeholder="Prénom ou nom…"
+        placeholderTextColor={COLORS.soft}
         value={q}
         onChangeText={setQ}
         autoCorrect={false}
+        autoFocus
       />
 
-      <View style={{ marginTop: 28, gap: 12 }}>
-        {q.trim().length < 2 && (
-          <Text style={styles.indication}>Tapez au moins 2 lettres pour lancer la recherche.</Text>
-        )}
+      <View style={{ marginTop: 20, gap: 10 }}>
         {loading && <ActivityIndicator color={COLORS.accent} />}
         {erreur && <Text style={styles.erreur}>{erreur}</Text>}
         {q.trim().length >= 2 && !loading && !erreur && resultats.length === 0 && (
-          <Text style={styles.indication}>Aucune personne trouvée pour « {q.trim()} ».</Text>
+          <Text style={styles.indication}>
+            Aucune personne trouvée pour « {q.trim()} » — elle n'a donc aucune union inscrite ici.
+          </Text>
         )}
 
         {resultats.map((r) => (
@@ -94,40 +93,38 @@ export default function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  h1: { fontFamily: FONTS.serif, fontSize: 32, color: COLORS.text, marginBottom: 6 },
-  sousTitre: { fontSize: 15, color: COLORS.textMuted, fontFamily: FONTS.regular, marginBottom: 28 },
+  titre: { fontFamily: FONTS.extrabold, fontSize: 24, color: COLORS.text, marginBottom: 4 },
+  sousTitre: { fontFamily: FONTS.regular, fontSize: 14.5, color: COLORS.muted, marginBottom: 20 },
 
-  champRecherche: {
-    maxWidth: 420,
-    backgroundColor: COLORS.inputBg,
+  champ: {
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: COLORS.inputBorder,
-    borderRadius: 6,
+    borderColor: COLORS.border,
+    borderRadius: 14,
     paddingHorizontal: 16,
-    paddingVertical: 13,
-    fontSize: 15,
+    minHeight: 54,
+    fontSize: 16,
     fontFamily: FONTS.regular,
     color: COLORS.text,
   },
 
-  indication: { fontSize: 14, color: COLORS.textSoft, fontFamily: FONTS.regular, paddingVertical: 8 },
-  erreur: { color: COLORS.red, fontFamily: FONTS.medium, fontSize: 13 },
+  indication: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.muted, lineHeight: 21, paddingVertical: 6 },
+  erreur: { color: COLORS.danger, fontFamily: FONTS.semibold, fontSize: 13, textAlign: "center" },
 
   carte: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
-    borderRadius: 8,
-    paddingVertical: 20,
-    paddingHorizontal: 22,
+    borderRadius: 16,
+    padding: 16,
   },
   carteHaut: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     flexWrap: "wrap",
-    gap: 16,
+    gap: 10,
   },
-  nom: { fontFamily: FONTS.serif, fontSize: 19, color: COLORS.text },
-  detail: { fontSize: 13, color: COLORS.textMuted, fontFamily: FONTS.regular, marginTop: 10, lineHeight: 21 },
+  nom: { fontFamily: FONTS.extrabold, fontSize: 17, color: COLORS.text },
+  detail: { fontFamily: FONTS.regular, fontSize: 13.5, color: COLORS.muted, marginTop: 8, lineHeight: 20 },
 });

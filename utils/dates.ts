@@ -10,10 +10,16 @@ const MOIS = [
   "juillet", "août", "septembre", "octobre", "novembre", "décembre",
 ];
 
-// Format long du prototype : « 14 juin 2015 »
+// Format long : « 14 juin 2015 »
 export function formaterDate(iso: string | null): string {
   if (!iso) return "—";
   const [annee, mois, jour] = iso.split("-").map(Number);
   if (!annee || !mois || !jour) return iso;
   return `${jour} ${MOIS[mois - 1]} ${annee}`;
+}
+
+export function libelleStatutUnion(statut: "actif" | "divorce" | "veuvage", dateFin: string | null): string {
+  if (statut === "actif") return "En cours";
+  if (statut === "divorce") return `Divorce · ${formaterDate(dateFin)}`;
+  return `Veuvage · ${formaterDate(dateFin)}`;
 }
