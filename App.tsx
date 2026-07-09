@@ -16,8 +16,9 @@ import AuthScreen from "./screens/AuthScreen";
 import HomeScreen from "./screens/HomeScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
 
-export type Session = { nom: string; communaute: string; email: string };
-type Screen = "loading" | "welcome" | "login" | "signup" | "home";
+export type Role = "imam" | "admin";
+export type Session = { nom: string; communaute: string; email: string; role: Role };
+type Screen = "loading" | "welcome" | "login" | "home";
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
   constructor(props: any) { super(props); this.state = { error: null }; }
@@ -67,20 +68,25 @@ function AppContent() {
       }
       const { data: profile, error } = await supabase
         .from("profiles")
-        .select("nom, mosquee")
+        .select("*")
         .eq("id", user.id)
         .single();
       if (error || !profile) {
         setScreen("welcome");
         return;
       }
-      setSession({ nom: profile.nom, communaute: profile.mosquee, email: user.email ?? "" });
+      setSession({
+        nom: profile.nom,
+        communaute: profile.mosquee,
+        email: user.email ?? "",
+        role: (profile.role as Role) ?? "imam",
+      });
       setScreen("home");
     })();
   }, []);
 
-  const handleAuthenticated = (nom: string, communaute: string, email: string) => {
-    setSession({ nom, communaute, email });
+  const handleAuthenticated = (s: Session) => {
+    setSession(s);
     setScreen("home");
   };
 
@@ -90,38 +96,14 @@ function AppContent() {
     setScreen("welcome");
   };
 
-  // Compte de démonstration partagé — pour essayer sans créer de compte.
-  const handleDemo = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: "demo@registre-nikah.app",
-      password: "demo-nikah-2026",
-    });
-    if (error || !data.user) return;
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("nom, mosquee")
-      .eq("id", data.user.id)
-      .single();
-    setSession({
-      nom: profile?.nom ?? "Témoin démo",
-      communaute: profile?.mosquee ?? "Démonstration",
-      email: data.user.email ?? "",
-    });
-    setScreen("home");
-  };
-
   if (!fontsLoaded || screen === "loading") {
     return <View style={{ flex: 1, backgroundColor: COLORS.bg }} />;
   }
 
-  if (screen === "login" || screen === "signup") {
+  if (screen === "login") {
     return (
       <>
-        <AuthScreen
-          initialMode={screen === "signup" ? "signup" : "login"}
-          onAuthenticated={handleAuthenticated}
-          onBack={() => setScreen("welcome")}
-        />
+        <AuthScreen onAuthenticated={handleAuthenticated} onBack={() => setScreen("welcome")} />
         <StatusBar style="dark" />
       </>
     );
@@ -138,11 +120,7 @@ function AppContent() {
 
   return (
     <>
-      <WelcomeScreen
-        onStart={() => setScreen("signup")}
-        onLogin={() => setScreen("login")}
-        onDemo={handleDemo}
-      />
+      <WelcomeScreen onLogin={() => setScreen("login")} />
       <StatusBar style="light" />
     </>
   );

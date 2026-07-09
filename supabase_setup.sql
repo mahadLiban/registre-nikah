@@ -14,13 +14,15 @@ create table public.profiles (
   id uuid references auth.users(id) primary key,
   nom text not null,
   mosquee text not null,
+  role text not null default 'imam' check (role in ('imam', 'admin')),
   created_at timestamptz default now()
 );
 
 alter table public.profiles enable row level security;
 
-create policy "Les imams voient leur profil" on public.profiles
-  for select using (auth.uid() = id);
+-- Tous les connectés lisent les profils (nécessaire pour afficher qui a ajouté quoi)
+create policy "Les connectés lisent les profils" on public.profiles
+  for select to authenticated using (true);
 
 create policy "Les imams modifient leur profil" on public.profiles
   for update using (auth.uid() = id);
@@ -98,6 +100,7 @@ create table public.mariages (
   imam text,
   statut text not null default 'actif' check (statut in ('actif', 'divorce', 'veuvage')),
   date_fin date,
+  cloture_par text,
   enregistre_par uuid references auth.users(id),
   cree_le timestamptz default now(),
   check (epoux_id <> epouse_id)
@@ -113,3 +116,13 @@ create policy "Les imams connectés enregistrent des mariages" on public.mariage
 
 create policy "Les imams connectés clôturent des mariages" on public.mariages
   for update to authenticated using (true);
+
+-- Seul le compte admin peut supprimer une entrée
+create policy "L'admin supprime des fiançailles" on public.mariages
+  for delete to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'));
+
+-- Seul le compte admin peut corriger les personnes (fautes de frappe)
+create policy "L'admin corrige les personnes" on public.personnes
+  for update to authenticated
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'));

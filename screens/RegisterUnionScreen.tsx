@@ -42,7 +42,7 @@ function BlocPersonne({
       <Text style={styles.blocTitre}>{titre}</Text>
       <View style={styles.rangee}>
         <TextInput
-          style={[styles.input, { flex: 1 }]}
+          style={[styles.input, styles.demi]}
           placeholder="Prénom"
           placeholderTextColor={COLORS.soft}
           value={valeur.prenom}
@@ -50,7 +50,7 @@ function BlocPersonne({
           autoCorrect={false}
         />
         <TextInput
-          style={[styles.input, { flex: 1 }]}
+          style={[styles.input, styles.demi]}
           placeholder="Nom"
           placeholderTextColor={COLORS.soft}
           value={valeur.nom}
@@ -169,7 +169,7 @@ export default function RegisterUnionScreen({ session, onVoirUnions }: Props) {
         <Text style={styles.blocTitre}>La cérémonie</Text>
         <View style={styles.rangee}>
           <TextInput
-            style={[styles.input, { flex: 1 }]}
+            style={[styles.input, styles.demi]}
             placeholder="Date — AAAA-MM-JJ"
             placeholderTextColor={COLORS.soft}
             value={date}
@@ -177,7 +177,7 @@ export default function RegisterUnionScreen({ session, onVoirUnions }: Props) {
             autoCorrect={false}
           />
           <TextInput
-            style={[styles.input, { flex: 1 }]}
+            style={[styles.input, styles.demi]}
             placeholder="Lieu (optionnel)"
             placeholderTextColor={COLORS.soft}
             value={lieu}
@@ -223,7 +223,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   blocTitre: { fontFamily: FONTS.bold, fontSize: 13, color: COLORS.muted, textTransform: "uppercase", letterSpacing: 0.6 },
-  rangee: { flexDirection: "row", gap: 10 },
+  rangee: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
+  demi: { flexGrow: 1, flexBasis: 132 },
   input: {
     backgroundColor: COLORS.inputBg,
     borderRadius: 12,

@@ -11,62 +11,62 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { Role, Session } from "../App";
 import { COLORS, CONTENT_MAX_WIDTH, FONTS } from "../components/theme";
 import { supabase } from "../lib/supabase";
 
 type Props = {
-  initialMode?: "login" | "signup";
-  onAuthenticated: (nom: string, communaute: string, email: string) => void;
+  onAuthenticated: (session: Session) => void;
   onBack: () => void;
 };
 
-export default function AuthScreen({ initialMode = "login", onAuthenticated, onBack }: Props) {
+// Les comptes sont fournis par l'administrateur (pas d'inscription libre).
+// Le « nom de compte » est converti en interne en adresse du registre.
+const DOMAINE = "@registre-nikah.app";
+
+export default function AuthScreen({ onAuthenticated, onBack }: Props) {
   const insets = useSafeAreaInsets();
-  const [mode, setMode] = useState<"login" | "signup">(initialMode);
-  const [nom, setNom] = useState("");
-  const [communaute, setCommunaute] = useState("");
-  const [email, setEmail] = useState("");
+  const [compte, setCompte] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isSignup = mode === "signup";
-
   const handleLogin = async () => {
     setError(null);
-    if (!email.trim() || !password) { setError("Entrez votre email et votre mot de passe."); return; }
+    if (!compte.trim() || !password) {
+      setError("Entrez votre nom de compte et votre mot de passe.");
+      return;
+    }
+    const email = compte.includes("@")
+      ? compte.trim().toLowerCase()
+      : compte.trim().toLowerCase().replace(/\s+/g, "") + DOMAINE;
     setLoading(true);
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     if (signInError || !data.user) {
       setLoading(false);
-      setError(signInError?.message === "Invalid login credentials" ? "Email ou mot de passe incorrect." : signInError?.message ?? "Connexion impossible.");
+      setError(
+        signInError?.message === "Invalid login credentials"
+          ? "Nom de compte ou mot de passe incorrect."
+          : signInError?.message ?? "Connexion impossible."
+      );
       return;
     }
-    const { data: profile, error: profileError } = await supabase.from("profiles").select("nom, mosquee").eq("id", data.user.id).single();
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", data.user.id)
+      .single();
     setLoading(false);
-    if (profileError || !profile) { setError("Profil introuvable pour ce compte."); return; }
-    onAuthenticated(profile.nom, profile.mosquee, data.user.email ?? "");
-  };
-
-  const handleSignup = async () => {
-    setError(null);
-    if (!nom.trim()) { setError("Entrez votre nom."); return; }
-    if (!communaute.trim()) { setError("Indiquez votre communauté ou votre lieu de culte."); return; }
-    if (!email.trim() || !email.includes("@")) { setError("Entrez un email valide."); return; }
-    if (password.length < 6) { setError("Le mot de passe doit faire au moins 6 caractères."); return; }
-    setLoading(true);
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: { data: { nom: nom.trim(), mosquee: communaute.trim() } },
+    if (profileError || !profile) {
+      setError("Profil introuvable pour ce compte.");
+      return;
+    }
+    onAuthenticated({
+      nom: profile.nom,
+      communaute: profile.mosquee,
+      email,
+      role: (profile.role as Role) ?? "imam",
     });
-    setLoading(false);
-    if (signUpError || !data.user) {
-      const msg = signUpError?.message ?? "";
-      setError(msg === "User already registered" ? "Un compte existe déjà avec cet email." : msg || "Inscription impossible.");
-      return;
-    }
-    onAuthenticated(nom.trim(), communaute.trim(), email.trim());
   };
 
   return (
@@ -78,52 +78,22 @@ export default function AuthScreen({ initialMode = "login", onAuthenticated, onB
 
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
           <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-            <Text style={styles.title}>{isSignup ? "Créer mon compte témoin" : "Connexion"}</Text>
+            <Text style={styles.title}>Connexion</Text>
             <Text style={styles.subtitle}>
-              {isSignup
-                ? "Le registre est réservé aux témoins qui enregistrent les cérémonies."
-                : "Content de vous revoir."}
+              Utilisez les identifiants qui vous ont été remis par l'administrateur du registre.
             </Text>
 
             <View style={styles.form}>
-              {isSignup && (
-                <>
-                  <View>
-                    <Text style={styles.label}>Votre nom complet</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Youssef Benali"
-                      placeholderTextColor={COLORS.soft}
-                      value={nom}
-                      onChangeText={setNom}
-                      autoCorrect={false}
-                    />
-                  </View>
-                  <View>
-                    <Text style={styles.label}>Communauté ou lieu de culte</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Al-Fath, Anvers"
-                      placeholderTextColor={COLORS.soft}
-                      value={communaute}
-                      onChangeText={setCommunaute}
-                      autoCorrect={false}
-                    />
-                  </View>
-                </>
-              )}
-
               <View>
-                <Text style={styles.label}>Email</Text>
+                <Text style={styles.label}>Nom de compte</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="vous@email.com"
+                  placeholder="imam1"
                   placeholderTextColor={COLORS.soft}
-                  value={email}
-                  onChangeText={setEmail}
+                  value={compte}
+                  onChangeText={setCompte}
                   autoCapitalize="none"
                   autoCorrect={false}
-                  keyboardType="email-address"
                 />
               </View>
 
@@ -144,22 +114,20 @@ export default function AuthScreen({ initialMode = "login", onAuthenticated, onB
 
               <Pressable
                 style={({ pressed }) => [styles.submitBtn, pressed && { opacity: 0.9 }]}
-                onPress={isSignup ? handleSignup : handleLogin}
+                onPress={handleLogin}
                 disabled={loading}
               >
                 {loading ? (
                   <ActivityIndicator color={COLORS.onAccent} />
                 ) : (
-                  <Text style={styles.submitText}>{isSignup ? "Créer le compte" : "Se connecter"}</Text>
+                  <Text style={styles.submitText}>Se connecter</Text>
                 )}
               </Pressable>
             </View>
 
-            <Pressable onPress={() => { setError(null); setMode(isSignup ? "login" : "signup"); }}>
-              <Text style={styles.switchText}>
-                {isSignup ? "Déjà inscrit ? Se connecter" : "Pas encore de compte ? S'inscrire"}
-              </Text>
-            </Pressable>
+            <Text style={styles.aide}>
+              Pas de compte ? L'accès au registre est attribué par l'administrateur.
+            </Text>
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
@@ -185,7 +153,7 @@ const styles = StyleSheet.create({
 
   scroll: { paddingTop: 20, paddingBottom: 40 },
   title: { fontFamily: FONTS.display, fontSize: 28, color: COLORS.accentDark, marginBottom: 6, lineHeight: 40 },
-  subtitle: { fontFamily: FONTS.regular, fontSize: 15, color: COLORS.muted, marginBottom: 26 },
+  subtitle: { fontFamily: FONTS.regular, fontSize: 15, color: COLORS.muted, marginBottom: 26, lineHeight: 22 },
 
   form: { gap: 16 },
   label: { fontFamily: FONTS.bold, fontSize: 13, color: COLORS.text, marginBottom: 7 },
@@ -208,11 +176,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   submitText: { color: COLORS.onAccent, fontFamily: FONTS.bold, fontSize: 16 },
-  switchText: {
-    color: COLORS.muted,
+  aide: {
+    color: COLORS.soft,
     fontFamily: FONTS.semibold,
-    fontSize: 13.5,
+    fontSize: 13,
     textAlign: "center",
     marginTop: 24,
+    lineHeight: 19,
   },
 });

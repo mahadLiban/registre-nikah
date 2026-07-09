@@ -17,6 +17,7 @@ export type Union = {
   imam: string | null; // nom du témoin qui a enregistré la cérémonie
   statut: "actif" | "divorce" | "veuvage";
   date_fin: string | null;
+  cloture_par: string | null; // nom du compte qui a clôturé
   epoux: Personne;
   epouse: Personne;
 };
@@ -172,12 +173,50 @@ export async function enregistrerUnion(demande: DemandeUnion): Promise<void> {
 export async function cloturerUnion(
   unionId: string,
   type: "divorce" | "veuvage",
-  dateFin: string
+  dateFin: string,
+  par: string
 ): Promise<void> {
   const { error } = await supabase
     .from("mariages")
-    .update({ statut: type, date_fin: dateFin })
+    .update({ statut: type, date_fin: dateFin, cloture_par: par })
     .eq("id", unionId)
     .eq("statut", "actif");
+  if (error) throw new Error(error.message);
+}
+
+// ---- Corrections (réservées au compte admin — la base le vérifie aussi via RLS)
+
+export async function corrigerPersonne(
+  personneId: string,
+  champs: { prenom: string; nom: string }
+): Promise<void> {
+  const { error } = await supabase
+    .from("personnes")
+    .update({ prenom: champs.prenom.trim(), nom: champs.nom.trim() })
+    .eq("id", personneId);
+  if (error) throw new Error(error.message);
+}
+
+export async function corrigerUnion(
+  unionId: string,
+  champs: { date_mariage: string; lieu: string }
+): Promise<void> {
+  const { error } = await supabase
+    .from("mariages")
+    .update({ date_mariage: champs.date_mariage, lieu: champs.lieu.trim() || null })
+    .eq("id", unionId);
+  if (error) throw new Error(error.message);
+}
+
+export async function rouvrirUnion(unionId: string): Promise<void> {
+  const { error } = await supabase
+    .from("mariages")
+    .update({ statut: "actif", date_fin: null, cloture_par: null })
+    .eq("id", unionId);
+  if (error) throw new Error(error.message);
+}
+
+export async function supprimerUnion(unionId: string): Promise<void> {
+  const { error } = await supabase.from("mariages").delete().eq("id", unionId);
   if (error) throw new Error(error.message);
 }

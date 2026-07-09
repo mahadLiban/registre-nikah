@@ -31,7 +31,8 @@ export default function HomeScreen({ session, onLogout }: Props) {
           <View style={{ flex: 1 }}>
             <Text style={styles.marque}>Le Registre</Text>
             <Text style={styles.identite} numberOfLines={1}>
-              {session.nom} · {session.communaute}
+              {session.nom}
+              {session.role === "admin" ? " · Administrateur" : ` · ${session.communaute}`}
             </Text>
           </View>
           <Pressable onPress={onLogout} hitSlop={10}>
@@ -62,7 +63,7 @@ export default function HomeScreen({ session, onLogout }: Props) {
             <RegisterUnionScreen session={session} onVoirUnions={() => setOnglet("unions")} />
           )}
           {onglet === "verifier" && <SearchScreen />}
-          {onglet === "unions" && <UnionsScreen />}
+          {onglet === "unions" && <UnionsScreen session={session} />}
         </ScrollView>
       </View>
     </View>
