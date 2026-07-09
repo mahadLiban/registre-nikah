@@ -36,15 +36,15 @@ export type Statut = {
 };
 
 export function statutDepuisUnions(unions: Union[]): Statut {
-  if (unions.length === 0) return { kind: "none", label: "Aucune union", union: null };
+  if (unions.length === 0) return { kind: "none", label: "Libre", union: null };
   const active = unions.find((u) => u.statut === "actif");
-  if (active) return { kind: "actif", label: "En union", union: active };
+  if (active) return { kind: "actif", label: "Fiancé(e)", union: active };
   const triees = [...unions].sort((a, b) =>
     (a.date_fin || a.date_mariage).localeCompare(b.date_fin || b.date_mariage)
   );
   const derniere = triees[triees.length - 1];
   if (derniere.statut === "veuvage") return { kind: "veuf", label: "Veuf(ve)", union: derniere };
-  return { kind: "divorce", label: "Divorcé(e)", union: derniere };
+  return { kind: "divorce", label: "Rupture", union: derniere };
 }
 
 export function conjointDe(u: Union, personneId: string): Personne {

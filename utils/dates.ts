@@ -20,6 +20,6 @@ export function formaterDate(iso: string | null): string {
 
 export function libelleStatutUnion(statut: "actif" | "divorce" | "veuvage", dateFin: string | null): string {
   if (statut === "actif") return "En cours";
-  if (statut === "divorce") return `Divorce · ${formaterDate(dateFin)}`;
-  return `Veuvage · ${formaterDate(dateFin)}`;
+  if (statut === "divorce") return `Rupture · ${formaterDate(dateFin)}`;
+  return `Décès · ${formaterDate(dateFin)}`;
 }

@@ -17,7 +17,7 @@ type Onglet = "enregistrer" | "verifier" | "unions";
 const ONGLETS: { id: Onglet; label: string }[] = [
   { id: "enregistrer", label: "Enregistrer" },
   { id: "verifier", label: "Vérifier" },
-  { id: "unions", label: "Unions" },
+  { id: "unions", label: "Fiançailles" },
 ];
 
 export default function HomeScreen({ session, onLogout }: Props) {

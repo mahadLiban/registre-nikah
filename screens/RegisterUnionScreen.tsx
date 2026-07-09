@@ -69,7 +69,7 @@ function BlocPersonne({
       {alerte && (
         <View style={styles.alerte}>
           <Text style={styles.alerteTexte}>
-            ⚠ {valeur.prenom.trim()} {valeur.nom.trim()} a déjà une union en cours
+            ⚠ {valeur.prenom.trim()} {valeur.nom.trim()} a déjà des fiançailles en cours
             (depuis le {formaterDate(alerte.date_mariage)}).
           </Text>
         </View>
@@ -141,12 +141,12 @@ export default function RegisterUnionScreen({ session, onVoirUnions }: Props) {
         <View style={styles.succesRond}>
           <Text style={styles.succesCoche}>✓</Text>
         </View>
-        <Text style={styles.succesTitre}>Union enregistrée</Text>
+        <Text style={styles.succesTitre}>Fiançailles enregistrées</Text>
         <Text style={styles.succesTexte}>
           {epoux.prenom} {epoux.nom} & {epouse.prenom} {epouse.nom} — c'est inscrit au registre.
         </Text>
         <Pressable style={({ pressed }) => [styles.cta, pressed && { opacity: 0.9 }]} onPress={recommencer}>
-          <Text style={styles.ctaTexte}>Enregistrer une autre union</Text>
+          <Text style={styles.ctaTexte}>Enregistrer d'autres fiançailles</Text>
         </Pressable>
         <Pressable onPress={onVoirUnions}>
           <Text style={styles.lien}>Voir le registre</Text>
@@ -157,7 +157,7 @@ export default function RegisterUnionScreen({ session, onVoirUnions }: Props) {
 
   return (
     <View>
-      <Text style={styles.titre}>Enregistrer une union</Text>
+      <Text style={styles.titre}>Enregistrer des fiançailles</Text>
       <Text style={styles.sousTitre}>
         Trois informations par personne, la date, et c'est inscrit.
       </Text>

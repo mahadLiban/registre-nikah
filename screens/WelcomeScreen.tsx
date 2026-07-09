@@ -32,7 +32,7 @@ export default function WelcomeScreen({ onStart, onLogin, onDemo }: Props) {
           </View>
 
           <Text style={styles.sousTitre}>
-            Chaque union célébrée, inscrite en un lieu unique.{"\n"}
+            Les fiançailles célébrées, inscrites en un lieu unique.{"\n"}
             Réservé aux témoins des cérémonies.
           </Text>
         </View>

@@ -1,6 +1,10 @@
 # Le Registre
 
-Un endroit unique où chaque union religieuse célébrée est inscrite.
+Un endroit unique où chaque fiançailles religieuses célébrées (khitba) sont inscrites.
+
+L'application enregistre volontairement des **fiançailles**, pas des mariages : en Belgique,
+le mariage civil doit précéder toute bénédiction nuptiale religieuse (art. 21 de la
+Constitution). Les fiançailles, elles, ne sont soumises à aucune restriction.
 
 Application Expo / React Native + Supabase, **réservée aux témoins** (les personnes qui
 célèbrent et enregistrent les cérémonies). Les particuliers n'ont pas accès aux données :
@@ -12,12 +16,11 @@ Trois onglets, une action principale :
 
 - **Enregistrer** (écran par défaut) : lui (prénom, nom, naissance), elle (idem), la date,
   le lieu — et c'est inscrit. Le témoin est déduit du compte connecté. Si l'une des deux
-  personnes a déjà une **union en cours**, une alerte apparaît pendant la saisie
+  personnes a déjà des **fiançailles en cours**, une alerte apparaît pendant la saisie
   (informative — le témoin reste décisionnaire).
-- **Vérifier** : rechercher une personne et voir son statut — En union / Divorcé(e) /
-  Veuf(ve) / Aucune union — avec le détail (conjoint, date, lieu).
-- **Unions** : le registre complet, avec clôture d'une union (divorce ou veuvage) en deux
-  taps.
+- **Vérifier** : rechercher une personne et voir son statut — Fiancé(e) / Rupture /
+  Veuf(ve) / Libre — avec le détail (avec qui, depuis quand, où).
+- **Fiançailles** : le registre complet, avec clôture (rupture ou décès) en deux taps.
 
 Une personne est identifiée par **prénom + nom + date de naissance** (contrainte unique
 en base, insensible à la casse).
@@ -55,9 +58,9 @@ En ligne : https://mahadliban.github.io/registre-nikah/
 - `components/theme.ts` — design tokens (Manrope, accent émeraude)
 - `supabase_setup.sql` — tables, RLS (lecture/écriture réservées aux connectés), trigger de profil
 
-Note : en base, la table des unions s'appelle `mariages` et le champ du témoin s'appelle
-`imam` (héritage des versions précédentes) — seule l'interface utilise le vocabulaire
-neutre.
+Note : en base, la table s'appelle `mariages`, les statuts `divorce`/`veuvage` et le champ
+du témoin `imam` (héritage des versions précédentes) — seule l'interface utilise le
+vocabulaire des fiançailles (rupture = `divorce`, décès = `veuvage`).
 
 ## Avant une vraie utilisation
 

@@ -48,13 +48,13 @@ export default function UnionsScreen() {
     <View>
       <Text style={styles.titre}>Le registre</Text>
       <Text style={styles.sousTitre}>
-        {unions.length} union{unions.length > 1 ? "s" : ""} inscrite{unions.length > 1 ? "s" : ""}, de la plus récente à la plus ancienne.
+        {unions.length} fiançailles inscrites, des plus récentes aux plus anciennes.
       </Text>
 
       {erreur && <Text style={styles.erreur}>{erreur}</Text>}
       {chargement && <ActivityIndicator color={COLORS.accent} />}
       {!chargement && unions.length === 0 && !erreur && (
-        <Text style={styles.indication}>Aucune union pour l'instant — la première s'inscrit en une minute.</Text>
+        <Text style={styles.indication}>Aucunes fiançailles pour l'instant — les premières s'inscrivent en une minute.</Text>
       )}
 
       <View style={{ gap: 10 }}>
@@ -79,7 +79,7 @@ export default function UnionsScreen() {
                   style={({ pressed }) => [styles.btnCloture, pressed && { opacity: 0.8 }]}
                   onPress={() => setCloture({ id: u.id, type: "divorce", date: "" })}
                 >
-                  <Text style={styles.btnClotureTexte}>Clôturer cette union…</Text>
+                  <Text style={styles.btnClotureTexte}>Clôturer ces fiançailles…</Text>
                 </Pressable>
               )}
 
@@ -91,7 +91,7 @@ export default function UnionsScreen() {
                       onPress={() => setCloture({ ...cloture, type: "divorce" })}
                     >
                       <Text style={[styles.toggleTexte, cloture.type === "divorce" && styles.toggleTexteActif]}>
-                        Divorce
+                        Rupture
                       </Text>
                     </Pressable>
                     <Pressable
@@ -99,7 +99,7 @@ export default function UnionsScreen() {
                       onPress={() => setCloture({ ...cloture, type: "veuvage" })}
                     >
                       <Text style={[styles.toggleTexte, cloture.type === "veuvage" && styles.toggleTexteActif]}>
-                        Veuvage
+                        Décès
                       </Text>
                     </Pressable>
                   </View>

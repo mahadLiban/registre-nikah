@@ -11,15 +11,15 @@ function detailPour(r: ResultatRecherche): string {
     const u = statut.union;
     const conjoint = conjointDe(u, personne.id);
     const lieu = u.lieu ? `, à ${u.lieu}` : "";
-    return `En union avec ${conjoint.prenom} ${conjoint.nom} depuis le ${formaterDate(u.date_mariage)}${lieu}.`;
+    return `Fiancé(e) à ${conjoint.prenom} ${conjoint.nom} depuis le ${formaterDate(u.date_mariage)}${lieu}.`;
   }
   if ((statut.kind === "divorce" || statut.kind === "veuf") && statut.union) {
     const u = statut.union;
     const conjoint = conjointDe(u, personne.id);
-    const motif = statut.kind === "veuf" ? "veuvage" : "divorce";
-    return `Union avec ${conjoint.prenom} ${conjoint.nom} terminée le ${formaterDate(u.date_fin)} (${motif}).`;
+    const motif = statut.kind === "veuf" ? "décès" : "rupture";
+    return `Fiançailles avec ${conjoint.prenom} ${conjoint.nom} terminées le ${formaterDate(u.date_fin)} (${motif}).`;
   }
-  return "Aucune union inscrite au registre.";
+  return "Aucunes fiançailles inscrites au registre.";
 }
 
 export default function SearchScreen() {
@@ -52,7 +52,7 @@ export default function SearchScreen() {
     <View>
       <Text style={styles.titre}>Vérifier une personne</Text>
       <Text style={styles.sousTitre}>
-        Avant une cérémonie, vérifiez si la personne a déjà une union en cours.
+        Avant une cérémonie, vérifiez si la personne a déjà des fiançailles en cours.
       </Text>
 
       <TextInput
@@ -70,7 +70,7 @@ export default function SearchScreen() {
         {erreur && <Text style={styles.erreur}>{erreur}</Text>}
         {q.trim().length >= 2 && !loading && !erreur && resultats.length === 0 && (
           <Text style={styles.indication}>
-            Aucune personne trouvée pour « {q.trim()} » — elle n'a donc aucune union inscrite ici.
+            Aucune personne trouvée pour « {q.trim()} » — elle n'a donc aucunes fiançailles inscrites ici.
           </Text>
         )}
 
