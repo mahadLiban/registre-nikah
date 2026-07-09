@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Role, Session } from "../App";
-import { COLORS, CONTENT_MAX_WIDTH, FONTS } from "../components/theme";
+import { COLORS, FONTS } from "../components/theme";
 import { supabase } from "../lib/supabase";
 
 type Props = {
@@ -70,17 +70,23 @@ export default function AuthScreen({ onAuthenticated, onBack }: Props) {
   };
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top + 16 }]}>
-      <View style={styles.contenu}>
-        <Pressable style={styles.backBtn} onPress={onBack} hitSlop={10}>
-          <Text style={styles.backBtnText}>‹</Text>
-        </Pressable>
+    <View style={[styles.root, { paddingTop: insets.top + 16, paddingBottom: insets.bottom }]}>
+      <Pressable style={styles.backBtn} onPress={onBack} hitSlop={10}>
+        <Text style={styles.backBtnText}>‹</Text>
+      </Pressable>
 
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-          <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-            <Text style={styles.title}>Connexion</Text>
+      <KeyboardAvoidingView style={{ flex: 1, alignSelf: "stretch" }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+          <View style={styles.carte}>
+            <Text style={styles.embleme}>۞</Text>
+            <Text style={styles.marque}>Le Registre</Text>
+            <View style={styles.filet}>
+              <View style={styles.filetLigne} />
+              <Text style={styles.filetEtoile}>✦</Text>
+              <View style={styles.filetLigne} />
+            </View>
             <Text style={styles.subtitle}>
-              Utilisez les identifiants qui vous ont été remis par l'administrateur du registre.
+              Connectez-vous avec les identifiants remis par l'administrateur.
             </Text>
 
             <View style={styles.form}>
@@ -88,8 +94,6 @@ export default function AuthScreen({ onAuthenticated, onBack }: Props) {
                 <Text style={styles.label}>Nom de compte</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="imam1"
-                  placeholderTextColor={COLORS.soft}
                   value={compte}
                   onChangeText={setCompte}
                   autoCapitalize="none"
@@ -101,8 +105,6 @@ export default function AuthScreen({ onAuthenticated, onBack }: Props) {
                 <Text style={styles.label}>Mot de passe</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="••••••••"
-                  placeholderTextColor={COLORS.soft}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
@@ -124,21 +126,21 @@ export default function AuthScreen({ onAuthenticated, onBack }: Props) {
                 )}
               </Pressable>
             </View>
+          </View>
 
-            <Text style={styles.aide}>
-              Pas de compte ? L'accès au registre est attribué par l'administrateur.
-            </Text>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </View>
+          <Text style={styles.aide}>
+            Pas de compte ? L'accès au registre est attribué par l'administrateur.
+          </Text>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.bg, alignItems: "center" },
-  contenu: { flex: 1, width: "100%", maxWidth: CONTENT_MAX_WIDTH, paddingHorizontal: 24 },
+  root: { flex: 1, backgroundColor: COLORS.bg, alignItems: "center", paddingHorizontal: 20 },
   backBtn: {
+    alignSelf: "flex-start",
     width: 40,
     height: 40,
     borderRadius: 12,
@@ -147,18 +149,46 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 8,
   },
   backBtnText: { fontSize: 22, color: COLORS.text, fontFamily: FONTS.bold, marginTop: -2 },
 
-  scroll: { paddingTop: 20, paddingBottom: 40 },
-  title: { fontFamily: FONTS.display, fontSize: 28, color: COLORS.accentDark, marginBottom: 6, lineHeight: 40 },
-  subtitle: { fontFamily: FONTS.regular, fontSize: 15, color: COLORS.muted, marginBottom: 26, lineHeight: 22 },
+  scroll: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 24,
+  },
+  carte: {
+    width: "100%",
+    maxWidth: 420,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 20,
+    paddingVertical: 30,
+    paddingHorizontal: 26,
+    alignItems: "center",
+  },
+  embleme: { fontSize: 34, color: COLORS.or, marginBottom: 4 },
+  marque: { fontFamily: FONTS.display, fontSize: 30, color: COLORS.accentDark, lineHeight: 40 },
+  filet: { flexDirection: "row", alignItems: "center", gap: 10, alignSelf: "stretch", marginVertical: 12 },
+  filetLigne: { flex: 1, height: 1, backgroundColor: COLORS.orPale },
+  filetEtoile: { color: COLORS.or, fontSize: 12 },
+  subtitle: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: COLORS.muted,
+    textAlign: "center",
+    lineHeight: 21,
+    marginBottom: 20,
+  },
 
-  form: { gap: 16 },
+  form: { gap: 14, alignSelf: "stretch" },
   label: { fontFamily: FONTS.bold, fontSize: 13, color: COLORS.text, marginBottom: 7 },
   input: {
     backgroundColor: COLORS.inputBg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     minHeight: 52,
@@ -170,7 +200,7 @@ const styles = StyleSheet.create({
   submitBtn: {
     backgroundColor: COLORS.accent,
     borderRadius: 14,
-    minHeight: 56,
+    minHeight: 54,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 4,
@@ -181,7 +211,8 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.semibold,
     fontSize: 13,
     textAlign: "center",
-    marginTop: 24,
+    marginTop: 18,
     lineHeight: 19,
+    maxWidth: 420,
   },
 });
